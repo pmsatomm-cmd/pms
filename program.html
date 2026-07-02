@@ -1,0 +1,1230 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Training Management System - Program</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+    <div id="programPage" class="app-container">
+        <div class="app-header">
+            <div>
+                <h1><i class="fas fa-graduation-cap"></i> Program Training Form</h1>
+                <div class="role-meta">
+                    <span class="role-badge" id="roleBadge">Role</span>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-outline" onclick="goBackToDashboard()">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </button>
+                
+                <button class="btn btn-purple" id="btnManageEmployees" onclick="openEmployeeModal()">
+                    <i class="fas fa-users"></i> Manage Employees
+                </button>
+                <button class="btn btn-primary" id="btnManageAdmins" onclick="openAdminModal()" style="background-color: #008037; display: none;">
+                    <i class="fas fa-user-shield"></i> Manage Admins
+                </button>
+                <button class="btn btn-success" id="btnGoogleSheets" onclick="openGoogleSheetsView()"
+                    style="background-color: #0f9d58; display: none;">
+                    <i class="fas fa-file-excel"></i> View in Sheets
+                </button>
+                <button class="btn btn-danger" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </div>
+
+        <div id="formContainer" class="form-container">
+            <div class="form-header">
+                <div class="form-title">
+                    <i class="fas fa-clipboard-list" style="color:#008037;"></i>
+                    Training Form: <span id="formCollegeName">---</span>
+                    <small id="formProgramName"></small>
+                </div>
+                <div class="form-actions">
+                    <button class="btn btn-success" onclick="saveCurrentProgram()"><i class="fas fa-save"></i>
+                        Save</button>
+                    <button class="btn btn-info" id="btnNewProgram" onclick="openNewProgramModal()"><i
+                            class="fas fa-plus"></i> New Program</button>
+                    <button class="btn btn-warning" id="btnArchive" onclick="markCompleteAndArchive()"><i
+                            class="fas fa-check-circle"></i> Complete & Archive</button>
+                    <button class="btn btn-outline" onclick="window.print()"><i class="fas fa-file-pdf"></i>
+                        Print</button>
+                </div>
+            </div>
+
+            <div class="program-selector">
+                <label><i class="fas fa-history"></i> Program:</label>
+                <select id="programSelector" onchange="switchProgram()"></select>
+                <span class="program-info" id="programInfo">Status: Not Started</span>
+            </div>
+
+            <div class="training-form" id="trainingForm">
+                <div class="stats">
+                    <span> Completed: <span class="num" id="tform-completedCount">0</span> / <span
+                            id="tform-totalCount">0</span> items</span>
+                    <span> Sections: <span class="num" id="tform-sectionCompleteCount">0</span> / <span
+                            id="tform-totalSectionCount">0</span> complete</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="fill" id="tform-progressFill"></div>
+                </div>
+
+                <div class="header-grid">
+                    <div class="field"><label><i class="fas fa-university"></i> College Name</label><input type="text"
+                            id="tform-collegeName" placeholder="e.g. ABC College" /></div>
+                    <div class="field"><label><i class="fas fa-layer-group"></i> Semester & Batches</label><input
+                            type="text" id="tform-semesterBatch" placeholder="SEM 6 / Batch A" /></div>
+                    <div class="field">
+                        <label><i class="fas fa-code"></i> Training Domain</label>
+                        <div class="multi-select-container" id="tformDomainMultiSelect">
+                            <div class="selected-options" onclick="toggleDomainDropdown('tform')">
+                                <span class="placeholder" id="tformDomainPlaceholder">Select domains...</span>
+                                <div id="tformSelectedDomainTags" style="display:flex; flex-wrap:wrap; gap:6px;"></div>
+                            </div>
+                            <div class="dropdown-options" id="tformDomainDropdown">
+                                <div class="option-item"><input type="checkbox" value="Soft Skills"
+                                        onchange="updateDomainSelection('tform')"><span class="option-label">Soft
+                                        Skills</span></div>
+                                <div class="option-item"><input type="checkbox" value="Technical"
+                                        onchange="updateDomainSelection('tform')"><span
+                                        class="option-label">Technical</span></div>
+                                <div class="option-item"><input type="checkbox" value="Aptitude"
+                                        onchange="updateDomainSelection('tform')"><span
+                                        class="option-label">Aptitude</span></div>
+                                <div class="option-item"><input type="checkbox" value="Global Certification Program"
+                                        onchange="updateDomainSelection('tform')"><span class="option-label">Global
+                                        Certification Program</span></div>
+                                <div class="option-item"><input type="checkbox" value="Campus to Corporate"
+                                        onchange="updateDomainSelection('tform')"><span class="option-label">Campus to
+                                        Corporate</span></div>
+                                <div class="option-item"><input type="checkbox" value="Company Specific Training"
+                                        onchange="updateDomainSelection('tform')"><span class="option-label">Company
+                                        Specific Training</span></div>
+                            </div>
+                        </div>
+                        <input type="hidden" id="tform-trainingDomain" value="" />
+                    </div>
+                    <div class="field"><label><i class="fas fa-calendar-check"></i> Start - End Date</label><input
+                            type="text" id="tform-trainingDates" placeholder="01-06-2026 to 30-06-2026" /></div>
+                    <div class="field"><label><i class="fas fa-clock"></i> Total Hours</label><input type="number"
+                            id="tform-totalHours" placeholder="40" /></div>
+                    <div class="field"><label><i class="fas fa-users"></i> Trainers & Trainees</label><input type="text"
+                            id="tform-trainerTrainee" placeholder="2 Trainers / 60 Trainees" /></div>
+                </div>
+
+                <div class="section" data-section="1">
+                    <div class="section-title">
+                        <i class="fas fa-hourglass-start"></i> 1. BEFORE TRAINING – Process Setup (One-time +
+                        Pre-Program)
+                        <span class="section-subtitle">
+                            This ensures freelancers don't "do their own thing".
+                        </span>
+
+                        <span class="section-status" id="tform-sectionStatus-1">
+                            Pending
+                        </span>
+
+                    </div>
+                    <div class="sub-section" data-subsection="1A">
+                        <div class="sub-section-header">
+                            <h3><i class="fas fa-flag-checkered"></i> A. Program Kickoff (Per College / Program)</h3>
+                            <div class="section-controls">
+                                <div class="master-toggle-wrapper">
+                                    <input type="checkbox" class="toggle-switch" data-target="1A"
+                                        onchange="tformToggleMaster(this)" />
+                                    <span class="master-status" id="tform-masterStatus-1A">Not Done</span>
+                                </div>
+                                <button class="btn-sm primary" onclick="tformSetAll('1A', true)"><i
+                                        class="fas fa-check-double"></i> All Done</button>
+                                <button class="btn-sm danger" onclick="tformSetAll('1A', false)"><i
+                                        class="fas fa-times"></i> All Not Done</button>
+                            </div>
+                        </div>
+                        <div class="checklist" data-subsection="1A">
+                            <div class="toggle-item" data-item="1A-1">
+                                <input type="checkbox" class="toggle-switch" data-item="1A-1"
+                                    onchange="tformToggleItem(this)" />
+                                <span class="toggle-status" id="tform-itemStatus-1A-1">Not Done</span>
+                                <span class="label-text"> College details confirmed</span>
+                            </div>
+                            <div class="toggle-item" data-item="1A-2">
+                                <input type="checkbox" class="toggle-switch" data-item="1A-2"
+                                    onchange="tformToggleItem(this)" />
+                                <span class="toggle-status" id="tform-itemStatus-1A-2">Not Done</span>
+                                <span class="label-text"> Course / semester / student count</span>
+                            </div>
+                            <div class="toggle-item flex-col" data-item="1A-3"
+                                style="align-items: stretch; height: auto; gap: 8px; grid-column: span 2;">
+                                <div style="display: flex; align-items: center; gap: 12px;">
+                                    <input type="checkbox" class="toggle-switch" data-item="1A-3"
+                                        onchange="tformToggleItem(this)" />
+                                    <span class="toggle-status" id="tform-itemStatus-1A-3">Not Done</span>
+                                    <span class="label-text" style="font-weight: 700;">Training scope</span>
+                                </div>
+                                <div class="multi-select-container" id="tform1A3DomainMultiSelect"
+                                    style="margin-top: 4px;">
+                                    <div class="selected-options" onclick="toggleDomainDropdown('tform1A3')"
+                                        style="min-height: 38px; padding: 4px 10px;">
+                                        <span class="placeholder" id="tform1A3DomainPlaceholder"
+                                            style="font-size: 13px;">Select scopes...</span>
+                                        <div id="tform1A3SelectedDomainTags"
+                                            style="display:flex; flex-wrap:wrap; gap:6px;"></div>
+                                    </div>
+                                    <div class="dropdown-options" id="tform1A3DomainDropdown">
+                                        <div class="option-item"><input type="checkbox" value="Soft Skills"
+                                                onchange="updateDomainSelection('tform1A3')"><span
+                                                class="option-label">Soft Skills</span></div>
+                                        <div class="option-item"><input type="checkbox" value="Technical"
+                                                onchange="updateDomainSelection('tform1A3')"><span
+                                                class="option-label">Technical</span></div>
+                                        <div class="option-item"><input type="checkbox" value="Aptitude"
+                                                onchange="updateDomainSelection('tform1A3')"><span
+                                                class="option-label">Aptitude</span></div>
+                                        <div class="option-item"><input type="checkbox"
+                                                value="Global Certification Program"
+                                                onchange="updateDomainSelection('tform1A3')"><span
+                                                class="option-label">Global Certification Program</span></div>
+                                        <div class="option-item"><input type="checkbox" value="Campus to Corporate"
+                                                onchange="updateDomainSelection('tform1A3')"><span
+                                                class="option-label">Campus to Corporate</span></div>
+                                        <div class="option-item"><input type="checkbox"
+                                                value="Company Specific Training"
+                                                onchange="updateDomainSelection('tform1A3')"><span
+                                                class="option-label">Company Specific Training</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="toggle-item" data-item="1A-4">
+                                <input type="checkbox" class="toggle-switch" data-item="1A-4"
+                                    onchange="tformToggleItem(this)" />
+                                <span class="toggle-status" id="tform-itemStatus-1A-4">Not Done</span>
+                                <span class="label-text">No. of hours & dates finalized</span>
+                            </div>
+                            <div class="toggle-item" data-item="1A-5">
+                                <input type="checkbox" class="toggle-switch" data-item="1A-5"
+                                    onchange="tformToggleItem(this)" />
+                                <span class="toggle-status" id="tform-itemStatus-1A-5">Not Done</span>
+                                <span class="label-text">Training schedule planned</span>
+                            </div>
+                            <div class="toggle-item" data-item="1A-6">
+                                <input type="checkbox" class="toggle-switch" data-item="1A-6"
+                                    onchange="tformToggleItem(this)" />
+                                <span class="toggle-status" id="tform-itemStatus-1A-6">Not Done</span>
+                                <span class="label-text"> Trainer assigned</span>
+                            </div>
+                            <div class="toggle-item" data-item="1A-7">
+                                <input type="checkbox" class="toggle-switch" data-item="1A-7"
+                                    onchange="tformToggleItem(this)" />
+                                <span class="toggle-status" id="tform-itemStatus-1A-7">Not Done</span>
+                                <span class="label-text">Session plan approved</span>
+                            </div>
+                            <div class="toggle-item" data-item="1A-8">
+                                <input type="checkbox" class="toggle-switch" data-item="1A-8"
+                                    onchange="tformToggleItem(this)" />
+                                <span class="toggle-status" id="tform-itemStatus-1A-8">Not Done</span>
+                                <span class="label-text"> WhatsApp Group Creation</span>
+                            </div>
+                        </div>
+                        <div class="outcome-box">
+                            <i class="fas fa-check-circle"></i> <strong>Outcome:</strong> Zero
+                            ambiguity before Day 1.
+                        </div>
+                        <div class="comment-box">
+                            <div class="comment-field">
+                                <label><i class="fas fa-comment"></i> Notes:</label>
+                                <textarea placeholder="Add comments..." data-comment="1A"></textarea>
+                            </div>
+                            <div class="employee-selector">
+                                <label><i class="fas fa-user-check"></i> Completed By:</label>
+                                <div class="employee-checkboxes" data-employee="1A" id="empSelect-1A"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="sub-section" data-subsection="1B">
+                        <div class="sub-section-header">
+                            <h3><i class="fas fa-user-check"></i> B. Trainer Onboarding (One-time)</h3>
+                            <div class="section-controls">
+                                <div class="master-toggle-wrapper">
+                                    <input type="checkbox" class="toggle-switch" data-target="1B"
+                                        onchange="tformToggleMaster(this)" />
+                                    <span class="master-status" id="tform-masterStatus-1B">Not Done</span>
+                                </div>
+                                <button class="btn-sm primary" onclick="tformSetAll('1B', true)"><i
+                                        class="fas fa-check-double"></i> All Done</button>
+                                <button class="btn-sm danger" onclick="tformSetAll('1B', false)"><i
+                                        class="fas fa-times"></i> All Not Done</button>
+                            </div>
+                        </div>
+                        <div class="checklist" data-subsection="1B">
+                            <div class="toggle-item" data-item="1B-1"><input type="checkbox" class="toggle-switch"
+                                    data-item="1B-1" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-1B-1">Not Done</span><span class="label-text"> Trainer
+                                    engagement form</span></div>
+                            <div class="toggle-item" data-item="1B-2"><input type="checkbox" class="toggle-switch"
+                                    data-item="1B-2" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-1B-2">Not Done</span><span class="label-text"> NDA + agreement
+                                    signed</span></div>
+                            <div class="toggle-item" data-item="1B-3"><input type="checkbox" class="toggle-switch"
+                                    data-item="1B-3" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-1B-3">Not Done</span><span class="label-text"> Trainer SOP
+                                    shared (dos & don'ts)</span></div>
+                            <div class="toggle-item" data-item="1B-4"><input type="checkbox" class="toggle-switch"
+                                    data-item="1B-4" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-1B-4">Not Done</span><span class="label-text"> Session plan
+                                    templates shared</span></div>
+                            <div class="toggle-item" data-item="1B-5"><input type="checkbox" class="toggle-switch"
+                                    data-item="1B-5" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-1B-5">Not Done</span><span class="label-text"> Reporting
+                                    formats / Dashboard shared</span></div>
+                            <div class="toggle-item" data-item="1B-6"><input type="checkbox" class="toggle-switch"
+                                    data-item="1B-6" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-1B-6">Not Done</span><span class="label-text"> Travel /
+                                    Accommodation & Co-ordination</span></div>
+                            <div class="toggle-item" data-item="1B-7"><input type="checkbox" class="toggle-switch"
+                                    data-item="1B-7" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-1B-7">Not Done</span><span class="label-text"> Create trainer's
+                                    profile</span></div>
+                        </div>
+                        <div class="outcome-box">
+                            <i class="fas fa-check-circle"></i> <strong>Outcome:</strong> Trainer
+                            knows what is expected and how they'll be evaluated.
+                        </div>
+                        <div class="comment-box">
+                            <div class="comment-field">
+                                <label><i class="fas fa-comment"></i> Notes:</label>
+                                <textarea placeholder="Add comments..." data-comment="1B"></textarea>
+                            </div>
+                            <div class="employee-selector">
+                                <label><i class="fas fa-user-check"></i> Completed By:</label>
+                                <div class="employee-checkboxes" data-employee="1B" id="empSelect-1B"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section" data-section="2">
+                    <div class="section-title">
+                        <i class="fas fa-play-circle"></i> 2. DURING TRAINING – Execution Control
+                        <span class="section-status" id="tform-sectionStatus-2">Pending</span>
+                    </div>
+                    <div class="sub-section" data-subsection="2A">
+                        <div class="sub-section-header">
+                            <h3><i class="fas fa-tasks"></i> A. Daily / Session-wise Controls</h3>
+                            <div class="section-controls">
+                                <div class="master-toggle-wrapper">
+                                    <input type="checkbox" class="toggle-switch" data-target="2A"
+                                        onchange="tformToggleMaster(this)" />
+                                    <span class="master-status" id="tform-masterStatus-2A">Not Done</span>
+                                </div>
+                                <button class="btn-sm primary" onclick="tformSetAll('2A', true)"><i
+                                        class="fas fa-check-double"></i> All Done</button>
+                                <button class="btn-sm danger" onclick="tformSetAll('2A', false)"><i
+                                        class="fas fa-times"></i> All Not Done</button>
+                            </div>
+                        </div>
+                        <div class="checklist" data-subsection="2A">
+                            <div class="toggle-item" data-item="2A-1"><input type="checkbox" class="toggle-switch"
+                                    data-item="2A-1" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-2A-1">Not Done</span><span class="label-text"> Attendance
+                                    captured</span></div>
+                            <div class="toggle-item" data-item="2A-2"><input type="checkbox" class="toggle-switch"
+                                    data-item="2A-2" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-2A-2">Not Done</span><span class="label-text"> Session
+                                    conducted as per plan</span></div>
+                            <div class="toggle-item" data-item="2A-3"><input type="checkbox" class="toggle-switch"
+                                    data-item="2A-3" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-2A-3">Not Done</span><span class="label-text"> Geo-tagged
+                                    Photos</span></div>
+                            <div class="toggle-item" data-item="2A-4"><input type="checkbox" class="toggle-switch"
+                                    data-item="2A-4" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-2A-4">Not Done</span><span class="label-text"> Trainer's Daily
+                                    Report</span></div>
+                            <div class="toggle-item" data-item="2A-5"><input type="checkbox" class="toggle-switch"
+                                    data-item="2A-5" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-2A-5">Not Done</span><span class="label-text"> Trainer's Daily
+                                    Feedback</span></div>
+                            <div class="toggle-item" data-item="2A-6"><input type="checkbox" class="toggle-switch"
+                                    data-item="2A-6" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-2A-6">Not Done</span><span class="label-text"> Daily
+                                    Assessment</span></div>
+                            <div class="toggle-item" data-item="2A-10"><input type="checkbox" class="toggle-switch"
+                                    data-item="2A-10" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-2A-10">Not Done</span><span class="label-text"> Mid
+                                    Assessment</span></div>
+                            <div class="toggle-item" data-item="2A-7"><input type="checkbox" class="toggle-switch"
+                                    data-item="2A-7" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-2A-7">Not Done</span><span class="label-text"> Activities /
+                                    labs delivered</span></div>
+                            <div class="toggle-item" data-item="2A-8"><input type="checkbox" class="toggle-switch"
+                                    data-item="2A-8" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-2A-8">Not Done</span><span class="label-text"> Trainer
+                                    punctuality</span></div>
+                            <div class="toggle-item" data-item="2A-9"><input type="checkbox" class="toggle-switch"
+                                    data-item="2A-9" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-2A-9">Not Done</span><span class="label-text"> Student
+                                    engagement level</span></div>
+                        </div>
+                        <div class="comment-box">
+                            <div class="comment-field">
+                                <label><i class="fas fa-comment"></i> Notes:</label>
+                                <textarea placeholder="Add comments..." data-comment="2A"></textarea>
+                            </div>
+                            <div class="employee-selector">
+                                <label><i class="fas fa-user-check"></i> Completed By:</label>
+                                <div class="employee-checkboxes" data-employee="2A" id="empSelect-2A"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section" data-section="3">
+                    <div class="section-title">
+                        <i class="fas fa-check-double"></i> 3. POST-TRAINING CHECKLIST (UPDATED VERSION)
+                        <span class="section-status" id="tform-sectionStatus-3">Pending</span>
+                    </div>
+                    <div class="sub-section" data-subsection="3A">
+                        <div class="sub-section-header">
+                            <h3><i class="fas fa-info-circle"></i> A. Program Details Verification</h3>
+                            <div class="section-controls">
+                                <div class="master-toggle-wrapper">
+                                    <input type="checkbox" class="toggle-switch" data-target="3A"
+                                        onchange="tformToggleMaster(this)" />
+                                    <span class="master-status" id="tform-masterStatus-3A">Not Done</span>
+                                </div>
+                                <button class="btn-sm primary" onclick="tformSetAll('3A', true)"><i
+                                        class="fas fa-check-double"></i> All Done</button>
+                                <button class="btn-sm danger" onclick="tformSetAll('3A', false)"><i
+                                        class="fas fa-times"></i> All Not Done</button>
+                            </div>
+                        </div>
+                        <div class="checklist" data-subsection="3A">
+                            <div class="toggle-item" data-item="3A-1"><input type="checkbox" class="toggle-switch"
+                                    data-item="3A-1" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-3A-1">Not Done</span><span class="label-text"> College
+                                    name</span></div>
+                            <div class="toggle-item" data-item="3A-2"><input type="checkbox" class="toggle-switch"
+                                    data-item="3A-2" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-3A-2">Not Done</span><span class="label-text"> Course /
+                                    semester</span></div>
+                            <div class="toggle-item flex-col" data-item="3A-3"
+                                style="align-items: stretch; height: auto; gap: 8px; grid-column: span 2;">
+                                <div style="display: flex; align-items: center; gap: 12px;">
+                                    <input type="checkbox" class="toggle-switch" data-item="3A-3"
+                                        onchange="tformToggleItem(this)" />
+                                    <span class="toggle-status" id="tform-itemStatus-3A-3">Not Done</span>
+                                    <span class="label-text" style="font-weight: 700;">Training domain</span>
+                                </div>
+                                <div class="multi-select-container" id="tform3A3DomainMultiSelect"
+                                    style="margin-top: 4px;">
+                                    <div class="selected-options" onclick="toggleDomainDropdown('tform3A3')"
+                                        style="min-height: 38px; padding: 4px 10px;">
+                                        <span class="placeholder" id="tform3A3DomainPlaceholder"
+                                            style="font-size: 13px;">Select domains...</span>
+                                        <div id="tform3A3SelectedDomainTags"
+                                            style="display:flex; flex-wrap:wrap; gap:6px;"></div>
+                                    </div>
+                                    <div class="dropdown-options" id="tform3A3DomainDropdown">
+                                        <div class="option-item"><input type="checkbox" value="Soft Skills"
+                                                onchange="updateDomainSelection('tform3A3')"><span
+                                                class="option-label">Soft Skills</span></div>
+                                        <div class="option-item"><input type="checkbox" value="Technical"
+                                                onchange="updateDomainSelection('tform3A3')"><span
+                                                class="option-label">Technical</span></div>
+                                        <div class="option-item"><input type="checkbox" value="Aptitude"
+                                                onchange="updateDomainSelection('tform3A3')"><span
+                                                class="option-label">Aptitude</span></div>
+                                        <div class="option-item"><input type="checkbox"
+                                                value="Global Certification Program"
+                                                onchange="updateDomainSelection('tform3A3')"><span
+                                                class="option-label">Global Certification Program</span></div>
+                                        <div class="option-item"><input type="checkbox" value="Campus to Corporate"
+                                                onchange="updateDomainSelection('tform3A3')"><span
+                                                class="option-label">Campus to Corporate</span></div>
+                                        <div class="option-item"><input type="checkbox"
+                                                value="Company Specific Training"
+                                                onchange="updateDomainSelection('tform3A3')"><span
+                                                class="option-label">Company Specific Training</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="toggle-item" data-item="3A-4"><input type="checkbox" class="toggle-switch"
+                                    data-item="3A-4" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-3A-4">Not Done</span><span class="label-text"> Training dates
+                                    completed as scheduled</span></div>
+                            <div class="toggle-item" data-item="3A-5"><input type="checkbox" class="toggle-switch"
+                                    data-item="3A-5" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-3A-5">Not Done</span><span class="label-text"> Total hours
+                                    delivered = hours committed</span></div>
+                        </div>
+                        <div class="comment-box">
+                            <div class="comment-field">
+                                <label><i class="fas fa-comment"></i> Notes:</label>
+                                <textarea placeholder="Add comments..." data-comment="3A"></textarea>
+                            </div>
+                            <div class="employee-selector">
+                                <label><i class="fas fa-user-check"></i> Completed By:</label>
+                                <div class="employee-checkboxes" data-employee="3A" id="empSelect-3A"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sub-section" data-subsection="3B">
+                        <div class="sub-section-header">
+                            <h3><i class="fas fa-user-tie"></i> B. Trainer Compliance Check</h3>
+                            <div class="section-controls">
+                                <div class="master-toggle-wrapper">
+                                    <input type="checkbox" class="toggle-switch" data-target="3B"
+                                        onchange="tformToggleMaster(this)" />
+                                    <span class="master-status" id="tform-masterStatus-3B">Not Done</span>
+                                </div>
+                                <button class="btn-sm primary" onclick="tformSetAll('3B', true)"><i
+                                        class="fas fa-check-double"></i> All Done</button>
+                                <button class="btn-sm danger" onclick="tformSetAll('3B', false)"><i
+                                        class="fas fa-times"></i> All Not Done</button>
+                            </div>
+                        </div>
+                        <div class="checklist" data-subsection="3B">
+                            <div class="toggle-item" data-item="3B-1"><input type="checkbox" class="toggle-switch"
+                                    data-item="3B-1" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-3B-1">Not Done</span><span class="label-text"> Trainer followed
+                                    approved session plan</span></div>
+                            <div class="toggle-item" data-item="3B-2"><input type="checkbox" class="toggle-switch"
+                                    data-item="3B-2" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-3B-2">Not Done</span><span class="label-text"> Professional
+                                    conduct maintained</span></div>
+                            <div class="toggle-item" data-item="3B-3"><input type="checkbox" class="toggle-switch"
+                                    data-item="3B-3" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-3B-3">Not Done</span><span class="label-text"> Punctuality
+                                    throughout the program</span></div>
+                            <div class="toggle-item" data-item="3B-4"><input type="checkbox" class="toggle-switch"
+                                    data-item="3B-4" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-3B-4">Not Done</span><span class="label-text"> Approved content
+                                    only used</span></div>
+                            <div class="toggle-item" data-item="3B-5"><input type="checkbox" class="toggle-switch"
+                                    data-item="3B-5" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-3B-5">Not Done</span><span class="label-text"> No unresolved
+                                    complaints/grievances</span></div>
+                            <div class="toggle-item" data-item="3B-6"><input type="checkbox" class="toggle-switch"
+                                    data-item="3B-6" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-3B-6">Not Done</span><span class="label-text"> Sharing inputs/
+                                    formats to trainers & Share HR mail ID along with Thank you message</span></div>
+                        </div>
+                        <div class="comment-box">
+                            <div class="comment-field">
+                                <label><i class="fas fa-comment"></i> Notes:</label>
+                                <textarea placeholder="Add comments..." data-comment="3B"></textarea>
+                            </div>
+                            <div class="employee-selector">
+                                <label><i class="fas fa-user-check"></i> Completed By:</label>
+                                <div class="employee-checkboxes" data-employee="3B" id="empSelect-3B"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sub-section" data-subsection="3C">
+                        <div class="sub-section-header">
+                            <h3><i class="fas fa-chart-line"></i> C. Assessment, Project, Attendance & Participation
+                            </h3>
+                            <div class="section-controls">
+                                <div class="master-toggle-wrapper">
+                                    <input type="checkbox" class="toggle-switch" data-target="3C"
+                                        onchange="tformToggleMaster(this)" />
+                                    <span class="master-status" id="tform-masterStatus-3C">Not Done</span>
+                                </div>
+                                <button class="btn-sm primary" onclick="tformSetAll('3C', true)"><i
+                                        class="fas fa-check-double"></i> All Done</button>
+                                <button class="btn-sm danger" onclick="tformSetAll('3C', false)"><i
+                                        class="fas fa-times"></i> All Not Done</button>
+                            </div>
+                        </div>
+                        <div class="checklist" data-subsection="3C">
+                            <div class="toggle-item" data-item="3C-1"><input type="checkbox" class="toggle-switch"
+                                    data-item="3C-1" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-3C-1">Not Done</span><span class="label-text"> Pre, Post, Mid &
+                                    Daily Assessment Completion</span></div>
+                            <div class="toggle-item" data-item="3C-2"><input type="checkbox" class="toggle-switch"
+                                    data-item="3C-2" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-3C-2">Not Done</span><span class="label-text"> Technical
+                                    Training - Project Completion</span></div>
+                            <div class="toggle-item" data-item="3C-3"><input type="checkbox" class="toggle-switch"
+                                    data-item="3C-3" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-3C-3">Not Done</span><span class="label-text"> All attendance &
+                                    Geo-Tagged/Photos captures for all sessions</span></div>
+                            <div class="toggle-item" data-item="3C-4"><input type="checkbox" class="toggle-switch"
+                                    data-item="3C-4" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-3C-4">Not Done</span><span class="label-text"> Attendance
+                                    verified with college coordinator</span></div>
+                            <div class="toggle-item" data-item="3C-5"><input type="checkbox" class="toggle-switch"
+                                    data-item="3C-5" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-3C-5">Not Done</span><span class="label-text"> Eligible student
+                                    list for certification</span></div>
+                            <div class="toggle-item" data-item="3C-6"><input type="checkbox" class="toggle-switch"
+                                    data-item="3C-6" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-3C-6">Not Done</span><span class="label-text"> Ineligible
+                                    students (low attendance) listed separately</span></div>
+                        </div>
+                        <div class="badge-rule success"><i class="fas fa-info-circle"></i> <strong>Note:</strong>
+                            Certificate eligibility should be linked to attendance.</div>
+                        <div class="comment-box">
+                            <div class="comment-field">
+                                <label><i class="fas fa-comment"></i> Notes:</label>
+                                <textarea placeholder="Add comments..." data-comment="3C"></textarea>
+                            </div>
+                            <div class="employee-selector">
+                                <label><i class="fas fa-user-check"></i> Completed By:</label>
+                                <div class="employee-checkboxes" data-employee="3C" id="empSelect-3C"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sub-section" data-subsection="3D">
+                        <div class="sub-section-header">
+                            <h3><i class="fas fa-clipboard-check"></i> D. Content & Delivery Validation</h3>
+                            <div class="section-controls">
+                                <div class="master-toggle-wrapper">
+                                    <input type="checkbox" class="toggle-switch" data-target="3D"
+                                        onchange="tformToggleMaster(this)" />
+                                    <span class="master-status" id="tform-masterStatus-3D">Not Done</span>
+                                </div>
+                                <button class="btn-sm primary" onclick="tformSetAll('3D', true)"><i
+                                        class="fas fa-check-double"></i> All Done</button>
+                                <button class="btn-sm danger" onclick="tformSetAll('3D', false)"><i
+                                        class="fas fa-times"></i> All Not Done</button>
+                            </div>
+                        </div>
+                        <div class="checklist" data-subsection="3D">
+                            <div class="toggle-item" data-item="3D-1"><input type="checkbox" class="toggle-switch"
+                                    data-item="3D-1" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-3D-1">Not Done</span><span class="label-text"> All modules
+                                    completed</span></div>
+                            <div class="toggle-item" data-item="3D-2"><input type="checkbox" class="toggle-switch"
+                                    data-item="3D-2" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-3D-2">Not Done</span><span class="label-text"> Activities /
+                                    labs / role plays conducted</span></div>
+                            <div class="toggle-item" data-item="3D-3"><input type="checkbox" class="toggle-switch"
+                                    data-item="3D-3" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-3D-3">Not Done</span><span class="label-text"> Approved PPTs &
+                                    materials used</span></div>
+                            <div class="toggle-item" data-item="3D-4"><input type="checkbox" class="toggle-switch"
+                                    data-item="3D-4" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-3D-4">Not Done</span><span class="label-text"> Meeting with
+                                    Trainers every alternate day</span></div>
+                            <div class="toggle-item" data-item="3D-5"><input type="checkbox" class="toggle-switch"
+                                    data-item="3D-5" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-3D-5">Not Done</span><span class="label-text"> Practical
+                                    examples included</span></div>
+                            <div class="toggle-item" data-item="3D-6"><input type="checkbox" class="toggle-switch"
+                                    data-item="3D-6" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-3D-6">Not Done</span><span class="label-text"> Doubt-clearance
+                                    sessions completed</span></div>
+                        </div>
+                        <div class="comment-box">
+                            <div class="comment-field">
+                                <label><i class="fas fa-comment"></i> Notes:</label>
+                                <textarea placeholder="Add comments..." data-comment="3D"></textarea>
+                            </div>
+                            <div class="employee-selector">
+                                <label><i class="fas fa-user-check"></i> Completed By:</label>
+                                <div class="employee-checkboxes" data-employee="3D" id="empSelect-3D"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sub-section" data-subsection="3E">
+                        <div class="sub-section-header">
+                            <h3><i class="fas fa-comments"></i> E. Student Feedback</h3>
+                            <div class="section-controls">
+                                <div class="master-toggle-wrapper">
+                                    <input type="checkbox" class="toggle-switch" data-target="3E"
+                                        onchange="tformToggleMaster(this)" />
+                                    <span class="master-status" id="tform-masterStatus-3E">Not Done</span>
+                                </div>
+                                <button class="btn-sm primary" onclick="tformSetAll('3E', true)"><i
+                                        class="fas fa-check-double"></i> All Done</button>
+                                <button class="btn-sm danger" onclick="tformSetAll('3E', false)"><i
+                                        class="fas fa-times"></i> All Not Done</button>
+                            </div>
+                        </div>
+                        <div class="checklist" data-subsection="3E">
+                            <div class="toggle-item" data-item="3E-1"><input type="checkbox" class="toggle-switch"
+                                    data-item="3E-1" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-3E-1">Not Done</span><span class="label-text"> Student feedback
+                                    collected</span></div>
+                            <div class="toggle-item" data-item="3E-2"><input type="checkbox" class="toggle-switch"
+                                    data-item="3E-2" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-3E-2">Not Done</span><span class="label-text"> Average rating
+                                    recorded</span></div>
+                            <div class="toggle-item" data-item="3E-3"><input type="checkbox" class="toggle-switch"
+                                    data-item="3E-3" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-3E-3">Not Done</span><span class="label-text"> Key positives
+                                    documented</span></div>
+                            <div class="toggle-item" data-item="3E-4"><input type="checkbox" class="toggle-switch"
+                                    data-item="3E-4" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-3E-4">Not Done</span><span class="label-text"> Key improvement
+                                    areas documented</span></div>
+                            <div class="toggle-item" data-item="3E-5"><input type="checkbox" class="toggle-switch"
+                                    data-item="3E-5" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-3E-5">Not Done</span><span class="label-text"> Escalations (if
+                                    any) noted</span></div>
+                        </div>
+                        <div class="comment-box">
+                            <div class="comment-field">
+                                <label><i class="fas fa-comment"></i> Notes:</label>
+                                <textarea placeholder="Add comments..." data-comment="3E"></textarea>
+                            </div>
+                            <div class="employee-selector">
+                                <label><i class="fas fa-user-check"></i> Completed By:</label>
+                                <div class="employee-checkboxes" data-employee="3E" id="empSelect-3E"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sub-section" data-subsection="3F">
+                        <div class="sub-section-header">
+                            <h3><i class="fas fa-handshake"></i> F. College Feedback & Sign-off</h3>
+                            <div class="section-controls">
+                                <div class="master-toggle-wrapper">
+                                    <input type="checkbox" class="toggle-switch" data-target="3F"
+                                        onchange="tformToggleMaster(this)" />
+                                    <span class="master-status" id="tform-masterStatus-3F">Not Done</span>
+                                </div>
+                                <button class="btn-sm primary" onclick="tformSetAll('3F', true)"><i
+                                        class="fas fa-check-double"></i> All Done</button>
+                                <button class="btn-sm danger" onclick="tformSetAll('3F', false)"><i
+                                        class="fas fa-times"></i> All Not Done</button>
+                            </div>
+                        </div>
+                        <div class="checklist" data-subsection="3F">
+                            <div class="toggle-item" data-item="3F-1"><input type="checkbox" class="toggle-switch"
+                                    data-item="3F-1" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-3F-1">Not Done</span><span class="label-text"> Faculty /
+                                    coordinator feedback collected</span></div>
+                            <div class="toggle-item" data-item="3F-2"><input type="checkbox" class="toggle-switch"
+                                    data-item="3F-2" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-3F-2">Not Done</span><span class="label-text"> Program
+                                    objectives met</span></div>
+                            <div class="toggle-item" data-item="3F-3"><input type="checkbox" class="toggle-switch"
+                                    data-item="3F-3" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-3F-3">Not Done</span><span class="label-text"> College approval
+                                    for certification</span></div>
+                            <div class="toggle-item" data-item="3F-4"><input type="checkbox" class="toggle-switch"
+                                    data-item="3F-4" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-3F-4">Not Done</span><span class="label-text"> Additional
+                                    sessions requested (if any)</span></div>
+                        </div>
+                        <div class="comment-box">
+                            <div class="comment-field">
+                                <label><i class="fas fa-comment"></i> Notes:</label>
+                                <textarea placeholder="Add comments..." data-comment="3F"></textarea>
+                            </div>
+                            <div class="employee-selector">
+                                <label><i class="fas fa-user-check"></i> Completed By:</label>
+                                <div class="employee-checkboxes" data-employee="3F" id="empSelect-3F"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sub-section" data-subsection="3G" style="border-left: 6px solid #008037;">
+                        <div class="sub-section-header">
+                            <h3><i class="fas fa-certificate"></i> G. Certificate Issuance Process</h3>
+                            <div class="section-controls">
+                                <div class="master-toggle-wrapper">
+                                    <input type="checkbox" class="toggle-switch" data-target="3G"
+                                        onchange="tformToggleMaster(this)" />
+                                    <span class="master-status" id="tform-masterStatus-3G">Not Done</span>
+                                </div>
+                                <button class="btn-sm primary" onclick="tformSetAll('3G', true)"><i
+                                        class="fas fa-check-double"></i> All Done</button>
+                                <button class="btn-sm danger" onclick="tformSetAll('3G', false)"><i
+                                        class="fas fa-times"></i> All Not Done</button>
+                            </div>
+                        </div>
+                        <div class="checklist" data-subsection="3G">
+                            <div class="toggle-item" data-item="3G-1"><input type="checkbox" class="toggle-switch"
+                                    data-item="3G-1" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-3G-1">Not Done</span><span class="label-text"> Final student
+                                    list approved by college</span></div>
+                            <div class="toggle-item" data-item="3G-2"><input type="checkbox" class="toggle-switch"
+                                    data-item="3G-2" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-3G-2">Not Done</span><span class="label-text"> Student details
+                                    verified (Name / USN / Semester / College)</span></div>
+                            <div class="toggle-item" data-item="3G-3"><input type="checkbox" class="toggle-switch"
+                                    data-item="3G-3" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-3G-3">Not Done</span><span class="label-text"> Certificates
+                                    generated (digital master copy)</span></div>
+                            <div class="toggle-item" data-item="3G-4"><input type="checkbox" class="toggle-switch"
+                                    data-item="3G-4" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-3G-4">Not Done</span><span class="label-text"> Proof-reading
+                                    completed by students / college</span></div>
+                            <div class="toggle-item" data-item="3G-5"><input type="checkbox" class="toggle-switch"
+                                    data-item="3G-5" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-3G-5">Not Done</span><span class="label-text"> Certificates
+                                    printed & signed</span></div>
+                            <div class="toggle-item" data-item="3G-6"><input type="checkbox" class="toggle-switch"
+                                    data-item="3G-6" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-3G-6">Not Done</span><span class="label-text"> Certificates
+                                    issued / dispatched</span></div>
+                            <div class="toggle-item" data-item="3G-7"><input type="checkbox" class="toggle-switch"
+                                    data-item="3G-7" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-3G-7">Not Done</span><span class="label-text">
+                                    Approval/acknowledgement received from college</span></div>
+                        </div>
+                        <div class="badge-rule critical"><i class="fas fa-lock"></i> <strong>Critical:</strong> No
+                            certificate should be printed without data verification & approval.</div>
+                        <div class="comment-box">
+                            <div class="comment-field">
+                                <label><i class="fas fa-comment"></i> Notes:</label>
+                                <textarea placeholder="Add comments..." data-comment="3G"></textarea>
+                            </div>
+                            <div class="employee-selector">
+                                <label><i class="fas fa-user-check"></i> Completed By:</label>
+                                <div class="employee-checkboxes" data-employee="3G" id="empSelect-3G"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sub-section" data-subsection="3H">
+                        <div class="sub-section-header">
+                            <h3><i class="fas fa-file-alt"></i> H. College Hard-Copy Report Submission</h3>
+                            <div class="section-controls">
+                                <div class="master-toggle-wrapper">
+                                    <input type="checkbox" class="toggle-switch" data-target="3H"
+                                        onchange="tformToggleMaster(this)" />
+                                    <span class="master-status" id="tform-masterStatus-3H">Not Done</span>
+                                </div>
+                                <button class="btn-sm primary" onclick="tformSetAll('3H', true)"><i
+                                        class="fas fa-check-double"></i> All Done</button>
+                                <button class="btn-sm danger" onclick="tformSetAll('3H', false)"><i
+                                        class="fas fa-times"></i> All Not Done</button>
+                            </div>
+                        </div>
+                        <div class="checklist" data-subsection="3H">
+                            <div class="toggle-item" data-item="3H-1"><input type="checkbox" class="toggle-switch"
+                                    data-item="3H-1" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-3H-1">Not Done</span><span class="label-text"> Final program
+                                    report prepared</span></div>
+                            <div class="toggle-item" data-item="3H-2"
+                                style="height: auto; align-items: flex-start; padding: 10px;">
+                                <input type="checkbox" class="toggle-switch" data-item="3H-2"
+                                    onchange="tformToggleItem(this)" style="margin-top: 4px;" />
+                                <span class="toggle-status" id="tform-itemStatus-3H-2" style="margin-top: 2px;">Not
+                                    Done</span>
+                                <div class="label-text" style="line-height: 1.5; margin-left: 8px;">
+                                    <strong>Report includes:</strong>
+                                    <div class="sub-checkbox-list"
+                                        style="margin-left: 10px; margin-top: 6px; display: flex; flex-direction: column; gap: 6px;">
+                                        <label
+                                            style="display: inline-flex; align-items: center; gap: 8px; font-weight: normal; cursor: pointer; font-size: 13px;">
+                                            <input type="checkbox" class="sub-checkbox" data-item="3H-2-1"
+                                                onchange="tformToggleSubItem(this)" />
+                                            <span>Program overview</span>
+                                        </label>
+                                        <label
+                                            style="display: inline-flex; align-items: center; gap: 8px; font-weight: normal; cursor: pointer; font-size: 13px;">
+                                            <input type="checkbox" class="sub-checkbox" data-item="3H-2-2"
+                                                onchange="tformToggleSubItem(this)" />
+                                            <span>Objectives</span>
+                                        </label>
+                                        <label
+                                            style="display: inline-flex; align-items: center; gap: 8px; font-weight: normal; cursor: pointer; font-size: 13px;">
+                                            <input type="checkbox" class="sub-checkbox" data-item="3H-2-3"
+                                                onchange="tformToggleSubItem(this)" />
+                                            <span>Training schedule</span>
+                                        </label>
+                                        <label
+                                            style="display: inline-flex; align-items: center; gap: 8px; font-weight: normal; cursor: pointer; font-size: 13px;">
+                                            <input type="checkbox" class="sub-checkbox" data-item="3H-2-4"
+                                                onchange="tformToggleSubItem(this)" />
+                                            <span>Modules covered</span>
+                                        </label>
+                                        <label
+                                            style="display: inline-flex; align-items: center; gap: 8px; font-weight: normal; cursor: pointer; font-size: 13px;">
+                                            <input type="checkbox" class="sub-checkbox" data-item="3H-2-5"
+                                                onchange="tformToggleSubItem(this)" />
+                                            <span>Attendance summary</span>
+                                        </label>
+                                        <label
+                                            style="display: inline-flex; align-items: center; gap: 8px; font-weight: normal; cursor: pointer; font-size: 13px;">
+                                            <input type="checkbox" class="sub-checkbox" data-item="3H-2-6"
+                                                onchange="tformToggleSubItem(this)" />
+                                            <span>Assessment Scores</span>
+                                        </label>
+                                        <label
+                                            style="display: inline-flex; align-items: center; gap: 8px; font-weight: normal; cursor: pointer; font-size: 13px;">
+                                            <input type="checkbox" class="sub-checkbox" data-item="3H-2-7"
+                                                onchange="tformToggleSubItem(this)" />
+                                            <span>Graphical Representation - Assessment Scores</span>
+                                        </label>
+                                        <label
+                                            style="display: inline-flex; align-items: center; gap: 8px; font-weight: normal; cursor: pointer; font-size: 13px;">
+                                            <input type="checkbox" class="sub-checkbox" data-item="3H-2-8"
+                                                onchange="tformToggleSubItem(this)" />
+                                            <span>Trainers profile</span>
+                                        </label>
+                                        <label
+                                            style="display: inline-flex; align-items: center; gap: 8px; font-weight: normal; cursor: pointer; font-size: 13px;">
+                                            <input type="checkbox" class="sub-checkbox" data-item="3H-2-9"
+                                                onchange="tformToggleSubItem(this)" />
+                                            <span>Certificates Sample</span>
+                                        </label>
+                                        <label
+                                            style="display: inline-flex; align-items: center; gap: 8px; font-weight: normal; cursor: pointer; font-size: 13px;">
+                                            <input type="checkbox" class="sub-checkbox" data-item="3H-2-10"
+                                                onchange="tformToggleSubItem(this)" />
+                                            <span>Student feedback summary</span>
+                                        </label>
+                                        <label
+                                            style="display: inline-flex; align-items: center; gap: 8px; font-weight: normal; cursor: pointer; font-size: 13px;">
+                                            <input type="checkbox" class="sub-checkbox" data-item="3H-2-11"
+                                                onchange="tformToggleSubItem(this)" />
+                                            <span>Geo-tagged Photos</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="toggle-item" data-item="3H-3"><input type="checkbox" class="toggle-switch"
+                                    data-item="3H-3" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-3H-3">Not Done</span><span class="label-text"> Report reviewed
+                                    internally</span></div>
+                            <div class="toggle-item" data-item="3H-4"><input type="checkbox" class="toggle-switch"
+                                    data-item="3H-4" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-3H-4">Not Done</span><span class="label-text"> Hard copy
+                                    printed & bound</span></div>
+                            <div class="toggle-item" data-item="3H-5"><input type="checkbox" class="toggle-switch"
+                                    data-item="3H-5" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-3H-5">Not Done</span><span class="label-text"> Submitted to
+                                    college</span></div>
+                            <div class="toggle-item" data-item="3H-6"><input type="checkbox" class="toggle-switch"
+                                    data-item="3H-6" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-3H-6">Not Done</span><span class="label-text"> College
+                                    acknowledgement received</span></div>
+                        </div>
+                        <div class="comment-box">
+                            <div class="comment-field">
+                                <label><i class="fas fa-comment"></i> Notes:</label>
+                                <textarea placeholder="Add comments..." data-comment="3H"></textarea>
+                            </div>
+                            <div class="employee-selector">
+                                <label><i class="fas fa-user-check"></i> Completed By:</label>
+                                <div class="employee-checkboxes" data-employee="3H" id="empSelect-3H"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sub-section" data-subsection="3I">
+                        <div class="sub-section-header">
+                            <h3><i class="fas fa-archive"></i> I. Documentation Archive</h3>
+                            <div class="section-controls">
+                                <div class="master-toggle-wrapper">
+                                    <input type="checkbox" class="toggle-switch" data-target="3I"
+                                        onchange="tformToggleMaster(this)" />
+                                    <span class="master-status" id="tform-masterStatus-3I">Not Done</span>
+                                </div>
+                                <button class="btn-sm primary" onclick="tformSetAll('3I', true)"><i
+                                        class="fas fa-check-double"></i> All Done</button>
+                                <button class="btn-sm danger" onclick="tformSetAll('3I', false)"><i
+                                        class="fas fa-times"></i> All Not Done</button>
+                            </div>
+                        </div>
+                        <div class="checklist" data-subsection="3I">
+                            <div class="toggle-item" data-item="3I-1"><input type="checkbox" class="toggle-switch"
+                                    data-item="3I-1" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-3I-1">Not Done</span><span class="label-text"> Attendance
+                                    sheets</span></div>
+                            <div class="toggle-item" data-item="3I-2"><input type="checkbox" class="toggle-switch"
+                                    data-item="3I-2" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-3I-2">Not Done</span><span class="label-text"> Session
+                                    plans</span></div>
+                            <div class="toggle-item" data-item="3I-3"><input type="checkbox" class="toggle-switch"
+                                    data-item="3I-3" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-3I-3">Not Done</span><span class="label-text"> Feedback
+                                    forms</span></div>
+                            <div class="toggle-item" data-item="3I-4"><input type="checkbox" class="toggle-switch"
+                                    data-item="3I-4" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-3I-4">Not Done</span><span class="label-text"> Certificates
+                                    soft copies</span></div>
+                            <div class="toggle-item" data-item="3I-5"><input type="checkbox" class="toggle-switch"
+                                    data-item="3I-5" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-3I-5">Not Done</span><span class="label-text"> Final program
+                                    report (PDF)</span></div>
+                            <div class="toggle-item" data-item="3I-6"><input type="checkbox" class="toggle-switch"
+                                    data-item="3I-6" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-3I-6">Not Done</span><span class="label-text"> Photos /
+                                    evidence (if applicable)</span></div>
+                        </div>
+                        <div class="comment-box">
+                            <div class="comment-field">
+                                <label><i class="fas fa-comment"></i> Notes:</label>
+                                <textarea placeholder="Add comments..." data-comment="3I"></textarea>
+                            </div>
+                            <div class="employee-selector">
+                                <label><i class="fas fa-user-check"></i> Completed By:</label>
+                                <div class="employee-checkboxes" data-employee="3I" id="empSelect-3I"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sub-section" data-subsection="3J">
+                        <div class="sub-section-header">
+                            <h3><i class="fas fa-money-bill-wave"></i> J. Trainer Payment Clearance</h3>
+                            <div class="section-controls">
+                                <div class="master-toggle-wrapper">
+                                    <input type="checkbox" class="toggle-switch" data-target="3J"
+                                        onchange="tformToggleMaster(this)" />
+                                    <span class="master-status" id="tform-masterStatus-3J">Not Done</span>
+                                </div>
+                                <button class="btn-sm primary" onclick="tformSetAll('3J', true)"><i
+                                        class="fas fa-check-double"></i> All Done</button>
+                                <button class="btn-sm danger" onclick="tformSetAll('3J', false)"><i
+                                        class="fas fa-times"></i> All Not Done</button>
+                            </div>
+                        </div>
+                        <div class="checklist" data-subsection="3J">
+                            <div class="toggle-item" data-item="3J-1"><input type="checkbox" class="toggle-switch"
+                                    data-item="3J-1" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-3J-1">Not Done</span><span class="label-text"> Checklist fully
+                                    completed</span></div>
+                            <div class="toggle-item" data-item="3J-2"><input type="checkbox" class="toggle-switch"
+                                    data-item="3J-2" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-3J-2">Not Done</span><span class="label-text"> No pending
+                                    escalations</span></div>
+                            <div class="toggle-item" data-item="3J-3"><input type="checkbox" class="toggle-switch"
+                                    data-item="3J-3" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-3J-3">Not Done</span><span class="label-text"> Approved for
+                                    payment</span></div>
+                            <div class="toggle-item" data-item="3J-4"><input type="checkbox" class="toggle-switch"
+                                    data-item="3J-4" onchange="tformToggleItem(this)"><span class="toggle-status"
+                                    id="tform-itemStatus-3J-4">Not Done</span><span class="label-text"> Training Cost &
+                                    Expenditure</span></div>
+                        </div>
+                        <div class="badge-rule critical"><i class="fas fa-gavel"></i> <strong>Rule:</strong> ❌ No
+                            Dashboard Process + ❌ No Documentation = ❌ No payment!</div>
+                        <div class="comment-box">
+                            <div class="comment-field">
+                                <label><i class="fas fa-comment"></i> Notes:</label>
+                                <textarea placeholder="Add comments..." data-comment="3J"></textarea>
+                            </div>
+                            <div class="employee-selector">
+                                <label><i class="fas fa-user-check"></i> Completed By:</label>
+                                <div class="employee-checkboxes" data-employee="3J" id="empSelect-3J"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title"><i class="fas fa-box-open"></i> Deliverables Per Training Program (At a
+                        Glance)</div>
+                    <div class="deliverables-grid">
+                        <div class="item"><i class="fas fa-user-graduate"></i> Students: <span>Training
+                                Certificate</span></div>
+                        <div class="item"><i class="fas fa-university"></i> College: <span>Hard-copy Report</span></div>
+                        <div class="item"><i class="fas fa-users-cog"></i> Internal Team : <span>Completed Checklist +
+                                Archive</span></div>
+                        <div class="item"><i class="fas fa-user-tie"></i> Trainer: <span>Payment after closure</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="signature-area" id="signatureArea">
+                    <div class="sig-item" id="sig-item-abishith">
+                        <label><i class="fas fa-pen"></i> Abishith Rao (Author | Founder & CEO)</label>
+                        <input type="text" id="tform-sig-abishith" placeholder="Signature" />
+                        <input type="date" id="tform-sig-abishith-date" />
+                        <span class="sig-status pending" id="sig-status-abishith">Pending</span>
+
+                    </div>
+                    <div class="sig-item" id="sig-item-lilly">
+                        <label><i class="fas fa-pen"></i> Lilly John (Team HR)</label>
+                        <input type="text" id="tform-sig-lilly" placeholder="Signature" />
+                        <input type="date" id="tform-sig-lilly-date" />
+                        <span class="sig-status pending" id="sig-status-lilly">Pending</span>
+                    </div>
+                    <div class="sig-item" id="sig-item-sai">
+
+                        <label><i class="fas fa-pen"></i> Sai Kumar (Team L&D)</label>
+                        <input type="text" id="tform-sig-sai" placeholder="Signature" />
+                        <input type="date" id="tform-sig-sai-date" />
+                        <span class="sig-status pending" id="sig-status-sai"> Pending</span>
+                    </div>
+                    <div class="signature-status-banner pending" id="signatureBanner"> PENDING: All 3 signatories must
+                        sign and date to complete the report</div>
+                    <div style="width:100%; text-align:center; font-size:12px; color:#6b85a0; margin-top:5px;"><i
+                            class="fas fa-lock"></i> Only Admin can sign</div>
+                </div>
+
+                <div id="saveMismatchBanner" class="mismatch-banner" style="display:none; margin-top:24px;">
+                    <div id="saveMismatchMessage">Warning: Program belongs to a different college.</div>
+                    <div style="display:flex; gap:8px; flex-wrap: wrap;">
+                        <button class="btn btn-primary btn-sm" id="saveMismatchProceed">Save to correct college</button>
+                        <button class="btn btn-outline btn-sm" id="saveMismatchCancel">Cancel</button>
+                    </div>
+                </div>
+
+                <div class="form-footer-actions">
+                    <button class="btn btn-success" onclick="saveCurrentProgram()"><i class="fas fa-save"></i>
+                        Save</button>
+                    <button class="btn btn-info" id="btnNewProgramFooter" onclick="openNewProgramModal()"><i
+                            class="fas fa-plus"></i> New Program</button>
+                    <button class="btn btn-warning" id="btnArchiveFooter" onclick="markCompleteAndArchive()"><i
+                            class="fas fa-check-circle"></i> Complete & Archive</button>
+                    <button class="btn btn-outline" onclick="window.print()"><i class="fas fa-file-pdf"></i> Print /
+                        PDF</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-overlay" id="addCollegeModal">
+            <div class="modal">
+                <h2><i class="fas fa-plus-circle" style="color:#008037;"></i> Add New College</h2>
+                <div class="field">
+                    <label>College Name <span class="required">*</span></label>
+                    <input type="text" id="newCollegeName" placeholder="Enter college name"
+                        onkeypress="if(event.key==='Enter') createCollege()" />
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-outline" onclick="closeAddCollegeModal()">Cancel</button>
+                    <button class="btn btn-primary" onclick="createCollege()"><i class="fas fa-plus"></i> Create
+                        College</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-overlay modal-full" id="newProgramModal">
+            <div class="modal">
+                <h2><i class="fas fa-plus-circle" style="color:#008037;"></i> Create New Program</h2>
+                <p style="color:#6b85a0; margin-bottom:20px;">Enter the training details for this program.</p>
+                <div class="field">
+                    <label>Program Name <span class="required">*</span></label>
+                    <input type="text" id="newProgramName" placeholder="e.g. Technical Training 2026" />
+                </div>
+                <div class="field">
+                    <label>Semester & Batches <span class="required">*</span></label>
+                    <input type="text" id="newProgramSemester" placeholder="e.g. SEM 6 / Batch A" />
+                </div>
+                <div class="field">
+                    <label>Training Domain <span class="required">*</span></label>
+                    <div class="multi-select-container" id="domainMultiSelect">
+                        <div class="selected-options" onclick="toggleDomainDropdown()">
+                            <span class="placeholder" id="domainPlaceholder">Select domains...</span>
+                            <div id="selectedDomainTags" style="display:flex; flex-wrap:wrap; gap:6px;"></div>
+                        </div>
+                        <div class="dropdown-options" id="domainDropdown">
+                            <div class="option-item"><input type="checkbox" value="Soft Skills"
+                                    onchange="updateDomainSelection()"><span class="option-label">Soft Skills</span>
+                            </div>
+                            <div class="option-item"><input type="checkbox" value="Technical"
+                                    onchange="updateDomainSelection()"><span class="option-label">Technical</span></div>
+                            <div class="option-item"><input type="checkbox" value="Aptitude"
+                                    onchange="updateDomainSelection()"><span class="option-label">Aptitude</span></div>
+                            <div class="option-item"><input type="checkbox" value="Global Certification Program"
+                                    onchange="updateDomainSelection()"><span class="option-label">Global Certification
+                                    Program</span></div>
+                            <div class="option-item"><input type="checkbox" value="Campus to Corporate"
+                                    onchange="updateDomainSelection()"><span class="option-label">Campus to
+                                    Corporate</span></div>
+                            <div class="option-item"><input type="checkbox" value="Company Specific Training"
+                                    onchange="updateDomainSelection()"><span class="option-label">Company Specific
+                                    Training</span></div>
+                        </div>
+                    </div>
+                    <input type="hidden" id="newProgramTrainingDomain" value="" />
+                </div>
+                <div class="form-row">
+                    <div class="field">
+                        <label>Training Start Date <span class="required">*</span></label>
+                        <input type="date" id="newProgramStartDate" />
+                    </div>
+                    <div class="field">
+                        <label>Training End Date <span class="required">*</span></label>
+                        <input type="date" id="newProgramEndDate" />
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="field">
+                        <label>Total No. of Hours <span class="required">*</span></label>
+                        <input type="number" id="newProgramTotalHours" placeholder="e.g. 40" />
+                    </div>
+                    <div class="field">
+                        <label>No. of Trainers & Trainees <span class="required">*</span></label>
+                        <input type="text" id="newProgramTrainerTrainee" placeholder="e.g. 2 Trainers / 60 Trainees" />
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-outline" onclick="closeNewProgramModal()">Cancel</button>
+                    <button class="btn btn-primary" onclick="createNewProgramWithDetails()"><i class="fas fa-plus"></i>
+                        Create Program</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-overlay" id="employeeModal">
+            <div class="modal">
+                <h2><i class="fas fa-users" style="color:#7c3aed;"></i> Manage Employees</h2>
+                <p style="color:#6b85a0; margin-bottom:20px;">Add or edit employee records for program completion
+                    tracking.</p>
+                <div id="employeeFormContainer">
+                    <div class="form-row">
+                        <div class="field">
+                            <label id="empNameLabel">Employee Name <span class="required">*</span></label>
+                            <input type="text" id="empName" placeholder="e.g. John Doe" />
+                        </div>
+                        <div class="field">
+                            <label id="empIdLabel">Employee ID <span class="required">*</span></label>
+                            <input type="text" id="empId" placeholder="e.g. EMP001" />
+                        </div>
+                    </div>
+                    <div class="form-row" id="empPasswordRow" style="display: none;">
+                        <div class="field">
+                            <label id="empPasswordLabel">Set Password <span class="required">*</span></label>
+                            <input type="password" id="empPassword" placeholder="Enter password" />
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:10px; margin-bottom:20px; flex-wrap: wrap;">
+                        <button class="btn btn-primary" id="btnAddEmployee" onclick="addEmployee()"><i
+                                class="fas fa-plus"></i> Add Employee</button>
+                        <button class="btn btn-outline" onclick="clearEmployeeFields()"><i class="fas fa-undo"></i>
+                            Clear</button>
+                    </div>
+                </div>
+                <div id="employeeFeedback" class="employee-feedback" role="status" aria-live="polite"></div>
+                <div id="employeeListDisplay" style="margin-top:10px;">
+                    <h4 style="margin-bottom:10px; color:#1a3550;">Employee List</h4>
+                    <div id="employeeListItems" style="max-height:260px; overflow-y:auto;"></div>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-outline" onclick="closeEmployeeModal()">Close</button>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+    <!-- Autosave Toast Notification -->
+    <div id="autosaveToast" style="
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        background: #0f172a;
+        color: #ffffff;
+        padding: 10px 18px;
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 4px 18px rgba(0,0,0,0.25);
+        opacity: 0;
+        transform: translateY(12px);
+        transition: opacity 0.25s ease, transform 0.25s ease;
+        pointer-events: none;
+        z-index: 9999;
+    ">
+        <i class="fas fa-check-circle" style="color:#008037; font-size:15px;"></i>
+        <span id="autosaveToastMsg">Saved</span>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>

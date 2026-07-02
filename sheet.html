@@ -1,0 +1,2099 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATOM Training System - Google Sheets Response Viewer</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Century Gothic';
+            color: #3c4043;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- GOOGLE SHEETS HEADER --- */
+        .sheets-header {
+            background-color: #fff;
+            border-bottom: 1px solid #e0e0e0;
+            padding: 8px 16px 4px 16px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sheet-logo-box {
+            width: 46px;
+            height: 46px;
+            border-radius: 14px;
+            border: 2px solid #d93025;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fff;
+        }
+
+        .sheet-header-logo {
+            width: 34px;
+            height: 34px;
+            object-fit: contain;
+            border-radius: 10px;
+        }
+
+        .sheets-logo {
+            display: none;
+        }
+
+        .title-wrapper {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .title-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .title-row input {
+            font-family: inherit;
+            font-size: 18px;
+            font-weight: 500;
+            color: #202124;
+            border: 1px solid transparent;
+            padding: 2px 6px;
+            border-radius: 4px;
+            outline: none;
+            width: 320px;
+            transition: 0.15s;
+        }
+
+        .title-row input:focus,
+        .title-row input:hover {
+            border-color: #dadce0;
+            background-color: #f1f3f4;
+        }
+
+        .title-star {
+            color: #5f6368;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .title-star.active {
+            color: #f4b400;
+        }
+
+        .menu-bar {
+            display: flex;
+            gap: 4px;
+            list-style: none;
+            margin-left: -4px;
+        }
+
+        .menu-item {
+            font-size: 14px;
+            color: #202124;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+
+        .menu-item:hover {
+            background-color: #f1f3f4;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-sheets-action {
+            padding: 8px 16px;
+            border-radius: 4px;
+            border: none;
+            font-weight: 500;
+            font-size: 14px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: background-color 0.2s;
+        }
+
+        .btn-green {
+            background-color: #008037;
+            color: #fff;
+        }
+
+        .btn-green:hover {
+            background-color: #006837;
+        }
+
+        .btn-outline {
+            background-color: #008037;
+            color: #fff;
+            border: 1px solid #008037;
+        }
+
+        .btn-outline:hover {
+            background-color: #006837;
+        }
+
+        .btn-blue {
+            background-color: #008037;
+            color: #fff;
+        }
+
+        .btn-blue:hover {
+            background-color: #006837;
+        }
+
+        /* --- TOOLBAR --- */
+        .sheets-toolbar {
+            background-color: #edf2fa;
+            border-bottom: 1px solid #e0e0e0;
+            padding: 4px 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            border-radius: 20px;
+            margin: 4px 8px;
+        }
+
+        .toolbar-group {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            border-right: 1px solid #dadce0;
+            padding-right: 8px;
+        }
+
+        .toolbar-group:last-child {
+            border-right: none;
+        }
+
+        .toolbar-btn {
+            background: none;
+            border: none;
+            padding: 6px;
+            border-radius: 4px;
+            color: #444746;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            transition: background-color 0.15s;
+        }
+
+        .toolbar-btn:hover {
+            background-color: #d3e3fd;
+            color: #041e49;
+        }
+
+        .toolbar-btn.active {
+            background-color: #c2e7ff;
+            color: #041e49;
+        }
+
+        .search-input-wrapper {
+            display: flex;
+            align-items: center;
+            background: white;
+            border: 1px solid #dadce0;
+            border-radius: 8px;
+            padding: 4px 8px;
+            margin-left: auto;
+            width: 240px;
+        }
+
+        .search-input-wrapper i {
+            color: #5f6368;
+            margin-right: 6px;
+            font-size: 13px;
+        }
+
+        .search-input-wrapper input {
+            border: none;
+            outline: none;
+            width: 100%;
+            font-size: 13px;
+            font-family: inherit;
+        }
+
+        /* --- FORMULA BAR --- */
+        .formula-bar {
+            background-color: #fff;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            padding: 4px 12px;
+            font-size: 13px;
+            color: #5f6368;
+            gap: 8px;
+        }
+
+        .formula-cell-indicator {
+            min-width: 60px;
+            font-weight: 500;
+            color: #202124;
+            padding-right: 8px;
+            border-right: 1px solid #dadce0;
+            text-align: center;
+        }
+
+        .formula-icon {
+            font-style: italic;
+            font-family: 'Century Gothic', sans-serif;
+            font-weight: 700;
+            font-size: 15px;
+            color: #80868b;
+            user-select: none;
+        }
+
+        .formula-input-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+        }
+
+        .formula-input-wrapper input {
+            width: 100%;
+            border: none;
+            outline: none;
+            font-family: inherit;
+            font-size: 14px;
+            color: #202124;
+            padding: 4px;
+        }
+
+        .sheet-preview-banner {
+            border-radius: 16px;
+            margin: 12px 16px;
+            display: flex;
+            overflow: hidden;
+            min-height: 92px;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+        }
+
+        .sheet-preview-banner-left {
+            background: #ffffff;
+            padding: 12px 12px 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 175px;
+        }
+
+        .sheet-preview-banner-left img {
+            width: 100%;
+            max-width: 110px;
+            height: auto;
+            object-fit: contain;
+        }
+
+        .sheet-preview-banner-right {
+            flex: 1;
+            background: linear-gradient(90deg, #0d9f43 0%, #0fa755 45%, #0ba94e 100%);
+            padding: 18px 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .sheet-preview-title {
+            color: #ffffff;
+            font-weight: 900;
+            font-size: 34px;
+            line-height: 1.05;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            margin: 0;
+        }
+
+        .sheet-preview-subtitle {
+            margin: 10px 0 0;
+            color: rgba(255, 255, 255, 0.92);
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+        }
+
+        /* --- SPREADSHEET GRID CONTAINER --- */
+        .grid-container {
+            flex: 1;
+            overflow: auto;
+            background-color: #f8f9fa;
+            position: relative;
+        }
+
+        .sheet-table {
+            border-collapse: collapse;
+            background-color: #fff;
+            font-size: 13px;
+            table-layout: fixed;
+            width: 100%;
+        }
+
+        /* Column Headers & Row Numbers */
+        .sheet-table th {
+            background-color: #f8f9fa;
+            border: 1px solid #c0c0c0;
+            color: #5f6368;
+            font-weight: normal;
+            text-align: center;
+            user-select: none;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        /* Top-left empty corner cell */
+        .sheet-table th.corner-cell {
+            left: 0;
+            z-index: 20;
+            width: 45px;
+            background-color: #e8eaed;
+        }
+
+        .sheet-table td.row-number {
+            background-color: #f8f9fa;
+            border: 1px solid #c0c0c0;
+            color: #5f6368;
+            text-align: center;
+            font-size: 11px;
+            position: sticky;
+            left: 0;
+            z-index: 5;
+            user-select: none;
+            width: 45px;
+        }
+
+        /* Standard data cell styling */
+        .sheet-table td.data-cell {
+            border: 1px solid #e0e0e0;
+            padding: 6px 8px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            cursor: cell;
+            transition: background-color 0.1s;
+        }
+
+        .sheet-table tr.header-row td {
+            background-color: #f1f3f4;
+            border: 1px solid #c0c0c0;
+            font-weight: 500;
+            color: #202124;
+            text-align: center;
+            position: sticky;
+            top: 25px;
+            /* height of Th row letters */
+            z-index: 9;
+            user-select: none;
+        }
+
+        .sheet-table tr:hover td.data-cell {
+            background-color: #fafdff;
+        }
+
+        /* Selected / Active Cell Outline */
+        .sheet-table td.data-cell.selected {
+            outline: 2px solid #1a73e8;
+            outline-offset: -2px;
+            background-color: #e8f0fe !important;
+        }
+
+        /* --- SETTINGS TAB LAYOUT --- */
+        .settings-container {
+            display: none;
+            padding: 40px;
+            background: white;
+            height: 100%;
+            overflow-y: auto;
+            max-width: 800px;
+            margin: 0 auto;
+            border-left: 1px solid #e0e0e0;
+            border-right: 1px solid #e0e0e0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .settings-container.active {
+            display: block;
+        }
+
+        .settings-header {
+            margin-bottom: 24px;
+            border-bottom: 2px solid #e2efda;
+            padding-bottom: 12px;
+        }
+
+        .settings-header h2 {
+            font-family: 'Century Gothic';
+            color: #0f9d58;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .settings-card {
+            background: #f8f9fa;
+            border: 1px solid #dadce0;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .settings-card h3 {
+            font-family: 'Century Gothic';
+            margin-bottom: 14px;
+            color: #202124;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-field {
+            margin-bottom: 16px;
+        }
+
+        .form-field label {
+            display: block;
+            font-weight: 500;
+            font-size: 14px;
+            margin-bottom: 6px;
+            color: #3c4043;
+        }
+
+        .form-field input[type="text"] {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #dadce0;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-field input[type="text"]:focus {
+            border-color: #0f9d58;
+            box-shadow: 0 0 0 3px rgba(15, 157, 88, 0.15);
+        }
+
+        .help-text {
+            font-size: 12px;
+            color: #5f6368;
+            margin-top: 6px;
+            line-height: 1.5;
+        }
+
+        .sync-log-box {
+            background-color: #202124;
+            color: #00ff66;
+            font-family: 'Century Gothic';
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            height: 180px;
+            overflow-y: auto;
+            margin-top: 10px;
+            border: 1px solid #3c4043;
+        }
+
+        /* Status Pills */
+        .status-pill {
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .status-pill.active {
+            background-color: #e6f4ea;
+            color: #137333;
+        }
+
+        .status-pill.complete {
+            background-color: #e6f4ea;
+            color: #137333;
+        }
+
+        .status-pill.archived {
+            background-color: #fce8e6;
+            color: #c5221f;
+        }
+
+        .status-pill.pending {
+            background-color: #fef7e0;
+            color: #b06000;
+        }
+
+        .status-pill.yet-to-start {
+            background-color: #f1f3f4;
+            color: #5f6368;
+        }
+
+        .status-pill.ongoing {
+            background-color: #e8f0fe;
+            color: #1a73e8;
+        }
+
+        /* --- BOTTOM TAB BAR --- */
+        .sheets-bottom-tabs {
+            background-color: #f8f9fa;
+            border-top: 1px solid #e0e0e0;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            gap: 1px;
+            user-select: none;
+        }
+
+        .sheets-bottom-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-right: 16px;
+        }
+
+        .tab-bar-btn {
+            background: none;
+            border: none;
+            width: 24px;
+            height: 24px;
+            color: #5f6368;
+            cursor: pointer;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tab-bar-btn:hover {
+            background-color: #e8eaed;
+            color: #202124;
+        }
+
+        .tab-items-wrapper {
+            display: flex;
+            height: 100%;
+            align-items: flex-end;
+        }
+
+        .sheet-tab {
+            background-color: #f1f3f4;
+            border: 1px solid #dadce0;
+            border-bottom: none;
+            border-radius: 4px 4px 0 0;
+            padding: 6px 16px;
+            font-size: 13px;
+            color: #5f6368;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-right: 4px;
+            height: 32px;
+            transition: background-color 0.15s, color 0.15s;
+        }
+
+        .sheet-tab:hover {
+            background-color: #e8eaed;
+            color: #202124;
+        }
+
+        .sheet-tab.active {
+            background-color: #fff;
+            color: #0f9d58;
+            font-weight: 500;
+            border-top: 3px solid #0f9d58;
+            border-left: 1px solid #c0c0c0;
+            border-right: 1px solid #c0c0c0;
+            height: 34px;
+            z-index: 2;
+        }
+
+        /* --- TOAST NOTIFICATIONS --- */
+        .toast {
+            position: fixed;
+            bottom: 60px;
+            right: 24px;
+            background-color: #323232;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.3s, transform 0.3s;
+            pointer-events: none;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .toast-icon {
+            color: #0f9d58;
+        }
+
+        /* --- ANALYTICS SIDEBAR --- */
+        .analytics-sidebar {
+            width: 380px;
+            background-color: #ffffff;
+            border-left: 1px solid #dadce0;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow: hidden;
+            transition: transform 0.3s ease, margin-right 0.3s ease;
+            box-shadow: -4px 0 16px rgba(0, 0, 0, 0.05);
+            z-index: 15;
+        }
+
+        .analytics-sidebar.collapsed {
+            margin-right: -380px;
+            transform: translateX(380px);
+        }
+
+        .sidebar-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #dadce0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #f8f9fa;
+        }
+
+        .sidebar-header h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #202124;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .close-sidebar-btn {
+            background: none;
+            border: none;
+            color: #5f6368;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            transition: background-color 0.2s;
+        }
+
+        .close-sidebar-btn:hover {
+            background-color: #e8eaed;
+            color: #202124;
+        }
+
+        .sidebar-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .stat-cards {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #e6f4ea 0%, #ceead6 100%);
+            border: 1px solid #a8dab5;
+            padding: 16px;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .stat-title {
+            font-size: 12px;
+            font-weight: 500;
+            color: #137333;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-val {
+            font-size: 28px;
+            font-weight: 700;
+            color: #137333;
+        }
+
+        .chart-container {
+            background-color: #ffffff;
+            border: 1px solid #dadce0;
+            border-radius: 8px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .chart-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #3c4043;
+            border-bottom: 1px solid #f1f3f4;
+            padding-bottom: 8px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- --- GOOGLE SHEETS HEADER --- -->
+    <header class="sheets-header">
+        <div class="header-top">
+            <div class="header-left">
+                <div class="sheet-logo-box">
+                    <img src="logo.png" alt="ATOM Logo" class="sheet-header-logo">
+                </div>
+                <div class="title-wrapper">
+                    <div class="title-row">
+                        <input type="text" id="sheetTitle" value="ATOM Training Responses Sheet" readonly>
+                        <i class="far fa-star title-star" id="starIcon" onclick="toggleStar()"></i>
+                    </div>
+                    <ul class="menu-bar">
+                        <li class="menu-item" onclick="goBack()">File</li>
+                        <li class="menu-item" onclick="showToast('Edit feature simulated')">Edit</li>
+                        <li class="menu-item" onclick="showToast('View fields updated')">View</li>
+                        <li class="menu-item" onclick="showToast('Mock Insert item')">Insert</li>
+                        <li class="menu-item" onclick="showToast('Format cells')">Format</li>
+                        <li class="menu-item" onclick="showToast('Data sorting simulated')">Data</li>
+                        <li class="menu-item" onclick="showToast('Tools trigger')">Tools</li>
+                        <li class="menu-item" onclick="showTab('settings')">Extensions</li>
+                        <li class="menu-item" onclick="showToast('Help portal')">Help</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="header-right">
+                <button class="btn-sheets-action btn-outline" onclick="toggleAnalytics()"
+                    style="background-color: #008037; border-color: #008037;">
+                    <i class="fas fa-chart-bar" style="color: #fff;"></i> View Charts
+                </button>
+                <button class="btn-sheets-action btn-outline" onclick="exportCSV()">
+                    <i class="fas fa-download"></i> Download CSV
+                </button>
+                <button class="btn-sheets-action btn-blue" onclick="goBack()">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- --- TOOLBAR --- -->
+    <div class="sheets-toolbar">
+        <div class="toolbar-group">
+            <button class="toolbar-btn" onclick="showToast('Undo')" title="Undo (Ctrl+Z)"><i
+                    class="fas fa-undo"></i></button>
+            <button class="toolbar-btn" onclick="showToast('Redo')" title="Redo (Ctrl+Y)"><i
+                    class="fas fa-redo"></i></button>
+            <button class="toolbar-btn" onclick="window.print()" title="Print (Ctrl+P)"><i
+                    class="fas fa-print"></i></button>
+        </div>
+        <div class="toolbar-group">
+            <button class="toolbar-btn" onclick="showToast('Text bold')" title="Bold"><i
+                    class="fas fa-bold"></i></button>
+            <button class="toolbar-btn" onclick="showToast('Text italic')" title="Italic"><i
+                    class="fas fa-italic"></i></button>
+            <button class="toolbar-btn" onclick="showToast('Text strikethrough')" title="Strikethrough"><i
+                    class="fas fa-strikethrough"></i></button>
+            <button class="toolbar-btn" onclick="showToast('Text color')" title="Text color"><i
+                    class="fas fa-font"></i></button>
+        </div>
+        <div class="toolbar-group">
+            <button class="toolbar-btn" onclick="showToast('Align left')" title="Horizontal align"><i
+                    class="fas fa-align-left"></i></button>
+            <button class="toolbar-btn" onclick="showToast('Align center')" title="Horizontal align"><i
+                    class="fas fa-align-center"></i></button>
+            <button class="toolbar-btn" onclick="showToast('Align right')" title="Horizontal align"><i
+                    class="fas fa-align-right"></i></button>
+        </div>
+        <div class="toolbar-group">
+            <button class="toolbar-btn" onclick="showToast('Borders')" title="Borders"><i
+                    class="fas fa-border-all"></i></button>
+            <button class="toolbar-btn" onclick="showToast('Fill color')" title="Fill color"><i
+                    class="fas fa-tint"></i></button>
+        </div>
+        <div class="search-input-wrapper">
+            <i class="fas fa-search"></i>
+            <input type="text" id="sheetsSearch" placeholder="Search rows..." oninput="handleSearch(this.value)">
+        </div>
+    </div>
+
+    <!-- --- FORMULA BAR --- -->
+    <div class="formula-bar">
+        <div class="formula-cell-indicator" id="activeCellLabel">A1</div>
+        <span class="formula-icon">fx</span>
+        <div class="formula-input-wrapper">
+            <input type="text" id="formulaInput" placeholder="" readonly>
+        </div>
+    </div>
+
+    <!-- --- SHEET BANNER --- -->
+    <div class="sheet-preview-banner">
+        <div class="sheet-preview-banner-left">
+            <img src="logo.png" alt="ATOM Logo">
+        </div>
+        <div class="sheet-preview-banner-right">
+            <div>
+                <h1 class="sheet-preview-title">PMS Tracking Sheet</h1>
+            </div>
+        </div>
+    </div>
+
+    <!-- --- MAIN WORKSPACE CONTAINER --- -->
+    <div class="main-workspace" style="display: flex; flex: 1; overflow: hidden; position: relative;">
+        <!-- --- SPREADSHEET GRID CONTAINER --- -->
+        <div class="grid-container" id="gridContainer"
+            style="flex: 1; overflow: auto; background-color: #f8f9fa; position: relative;">
+            <!-- Sheet 1: Program Lifecycles Grid -->
+            <table class="sheet-table" id="programsTable">
+                <thead>
+                    <tr id="colHeaders">
+                        <th class="corner-cell"></th>
+                        <!-- Generated Columns A, B, C... -->
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <!-- Generated Rows -->
+                </tbody>
+            </table>
+
+            <!-- Sheet 2: Employees Grid (Initially Hidden) -->
+            <table class="sheet-table" id="employeesTable" style="display: none;">
+                <thead>
+                    <tr id="colHeadersEmp">
+                        <th class="corner-cell"></th>
+                    </tr>
+                </thead>
+                <tbody id="tableBodyEmp">
+                    <!-- Generated Rows -->
+                </tbody>
+            </table>
+
+            <!-- Sheet 3: Activity Logs Grid (Initially Hidden) -->
+            <div id="logsFilterContainer" style="display: none; padding: 16px; background: #f8f9fa; border-bottom: 1px solid #e0e0e0;">
+                <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                    <label style="font-weight: 600; color: #202124;">Filter by:</label>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="text" id="filterUserId" placeholder="User ID" style="padding: 8px 12px; border: 1px solid #dadce0; border-radius: 4px; font-size: 13px; width: 150px;">
+                        <select id="filterRole" style="padding: 8px 12px; border: 1px solid #dadce0; border-radius: 4px; font-size: 13px; width: 120px;">
+                            <option value="">All Roles</option>
+                            <option value="admin">Admin</option>
+                            <option value="employee">Employee</option>
+                        </select>
+                        <select id="filterEvent" style="padding: 8px 12px; border: 1px solid #dadce0; border-radius: 4px; font-size: 13px; width: 120px;">
+                            <option value="">All Events</option>
+                            <option value="LOGIN">Login</option>
+                            <option value="LOGOUT">Logout</option>
+                        </select>
+                        <button onclick="applyActivityLogFilter()" style="padding: 8px 16px; background: #008037; color: white; border: none; border-radius: 4px; font-size: 13px; cursor: pointer; font-weight: 600;">Filter</button>
+                        <button onclick="clearActivityLogFilter()" style="padding: 8px 16px; background: #008037; color: white; border: none; border-radius: 4px; font-size: 13px; cursor: pointer; font-weight: 600;">Clear</button>
+                    </div>
+                </div>
+            </div>
+            <table class="sheet-table" id="loginLogsTable" style="display: none;">
+                <thead>
+                    <tr id="colHeadersLogs">
+                        <th class="corner-cell"></th>
+                    </tr>
+                </thead>
+                <tbody id="tableBodyLogs">
+                    <!-- Generated Rows -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- --- ANALYTICS SIDEBAR PANEL --- -->
+        <div id="analyticsSidebar" class="analytics-sidebar collapsed">
+            <div class="sidebar-header">
+                <h3><i class="fas fa-chart-pie"></i> Completion Analytics</h3>
+                <button class="close-sidebar-btn" onclick="toggleAnalytics()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="sidebar-content">
+                <div class="stat-cards">
+                    <div class="stat-card">
+                        <div class="stat-title">Overall Avg. Completion</div>
+                        <div class="stat-val" id="avgCompletionVal">0%</div>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">Completed vs Pending Items</div>
+                    <canvas id="itemsSummaryChart" style="max-height: 200px;"></canvas>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">Course Completion Rates</div>
+                    <canvas id="courseCompletionChart" style="max-height: 250px;"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- --- BOTTOM TAB BAR --- -->
+    <footer class="sheets-bottom-tabs">
+        <div class="sheets-bottom-left">
+            <button class="tab-bar-btn" onclick="showToast('Add sheet simulation')"><i class="fas fa-plus"></i></button>
+            <button class="tab-bar-btn" onclick="showToast('List sheets')"><i class="fas fa-bars"></i></button>
+        </div>
+        <div class="tab-items-wrapper">
+            <div class="sheet-tab active" id="tabPrograms" onclick="showTab('programs')">
+                <i class="fas fa-table" style="color:#0f9d58;"></i> Programs Sheet
+            </div>
+            <div class="sheet-tab" id="tabEmployees" onclick="showTab('employees')">
+                <i class="fas fa-users" style="color:#7c3aed;"></i> Employees list
+            </div>
+            <div class="sheet-tab" id="tabLogs" onclick="showTab('logs')">
+                <i class="fas fa-history" style="color:#f4b400;"></i> Activity Log
+            </div>
+        </div>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">
+        <i class="fas fa-check-circle toast-icon" id="toastIcon"></i>
+        <span id="toastMessage">Saved changes</span>
+    </div>
+
+    <script>
+        const STORAGE_COLLEGES = 'collegesDataV2';
+        const STORAGE_EMPLOYEES = 'employeesData';
+        const STORAGE_WEBHOOK = 'tms_webhook_url';
+        const SERVER_BASE = window.location.origin;
+
+        const codeToLabelMap = {
+            "1A-1": "College details confirmed",
+            "1A-2": "Course / semester / student count",
+            "1A-3": "Training scope",
+            "1A-4": "No. of hours & dates finalized",
+            "1A-5": "Training schedule planned",
+            "1A-6": "Trainer assigned",
+            "1A-7": "Session plan approved",
+            "1A-8": "WhatsApp Group Creation",
+            "1B-1": "Trainer engagement form",
+            "1B-2": "NDA + agreement signed",
+            "1B-3": "Trainer SOP shared (dos & don'ts)",
+            "1B-4": "Session plan templates shared",
+            "1B-5": "Reporting formats / Dashboard shared",
+            "1B-6": "Travel / Accommodation & Co-ordination",
+            "1B-7": "Create trainer's profile",
+            "2A-1": "Attendance captured",
+            "2A-2": "Session conducted as per plan",
+            "2A-3": "Geo-tagged Photos",
+            "2A-4": "Trainer's Daily Report",
+            "2A-5": "Trainer's Daily Feedback",
+            "2A-6": "Daily Assessment",
+            "2A-10": "Mid Assessment",
+            "2A-7": "Activities / labs delivered",
+            "2A-8": "Trainer punctuality",
+            "2A-9": "Student engagement level",
+            "3A-1": "College name",
+            "3A-2": "Course / semester",
+            "3A-3": "Training domain",
+            "3A-4": "Training dates completed as scheduled",
+            "3A-5": "Total hours delivered = hours committed",
+            "3B-1": "Trainer followed approved session plan",
+            "3B-2": "Professional conduct maintained",
+            "3B-3": "Punctuality throughout the program",
+            "3B-4": "Approved content only used",
+            "3B-5": "No unresolved complaints/grievances",
+            "3B-6": "Sharing inputs/ formats to trainers & Share HR mail ID along with Thank you message",
+            "3C-1": "Pre, Post, Mid & Daily Assessment Completion",
+            "3C-2": "Technical Training - Project Completion",
+            "3C-3": "All attendance & Geo-Tagged/Photos captures for all sessions",
+            "3C-4": "Attendance verified with college coordinator",
+            "3C-5": "Eligible student list for certification",
+            "3C-6": "Ineligible students (low attendance) listed separately",
+            "3D-1": "All modules completed",
+            "3D-2": "Activities / labs / role plays conducted",
+            "3D-3": "Approved PPTs & materials used",
+            "3D-4": "Meeting with Trainers every alternate day",
+            "3D-5": "Practical examples included",
+            "3D-6": "Doubt-clearance sessions completed",
+            "3E-1": "Student feedback collected",
+            "3E-2": "Average rating recorded",
+            "3E-3": "Key positives documented",
+            "3E-4": "Key improvement areas documented",
+            "3E-5": "Escalations (if any) noted",
+            "3F-1": "Faculty / coordinator feedback collected",
+            "3F-2": "Program objectives met",
+            "3F-3": "College approval for certification",
+            "3F-4": "Additional sessions requested (if any)",
+            "3G-1": "Final student list approved by college",
+            "3G-2": "Student details verified (Name / USN / Semester / College)",
+            "3G-3": "Certificates generated (digital master copy)",
+            "3G-4": "Proof-reading completed by students / college",
+            "3G-5": "Certificates printed & signed",
+            "3G-6": "Certificates issued / dispatched",
+            "3G-7": "Approval/acknowledgement received from college",
+            "3H-1": "Final program report prepared",
+            "3H-2": "Report includes",
+            "3H-2-1": "Program overview",
+            "3H-2-2": "Objectives",
+            "3H-2-3": "Training schedule",
+            "3H-2-4": "Modules covered",
+            "3H-2-5": "Attendance summary",
+            "3H-2-6": "Assessment Scores",
+            "3H-2-7": "Graphical Representation - Assessment Scores",
+            "3H-2-8": "Trainers profile",
+            "3H-2-9": "Certificates Sample",
+            "3H-2-10": "Student feedback summary",
+            "3H-2-11": "Geo-tagged Photos",
+            "3H-3": "Report reviewed internally",
+            "3H-4": "Hard copy printed & bound",
+            "3H-5": "Submitted to college",
+            "3H-6": "College acknowledgement received",
+            "3I-1": "Attendance sheets",
+            "3I-2": "Session plans",
+            "3I-3": "Feedback forms",
+            "3I-4": "Certificates soft copies",
+            "3I-5": "Final program report (PDF)",
+            "3I-6": "Photos / evidence (if applicable)",
+            "3J-1": "Checklist fully completed",
+            "3J-2": "No pending escalations",
+            "3J-3": "Approved for payment",
+            "3J-4": "Training Cost & Expenditure"
+        };
+
+        function formatUnfilledFields(unfilledStr) {
+            if (!unfilledStr || unfilledStr === 'None') return 'None';
+            return unfilledStr.split(',').map(item => {
+                const trimmed = item.trim();
+                return codeToLabelMap[trimmed] || trimmed;
+            }).join(', ');
+        }
+
+        let colleges = {};
+        let employees = [];
+        let activityLogs = [];
+        let activeTab = 'programs';
+        let selectedCell = null;
+        let searchQuery = '';
+
+        // Star indicator
+        function toggleStar() {
+            const star = document.getElementById('starIcon');
+            star.classList.toggle('far');
+            star.classList.toggle('fas');
+            star.classList.toggle('active');
+            showToast(star.classList.contains('active') ? 'Starred spreadsheet' : 'Unstarred spreadsheet');
+        }
+
+        // Return back to main page
+        function goBack() {
+            window.location.href = 'dashboard.html';
+        }
+
+        // Display Toast popup
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const icon = document.getElementById('toastIcon');
+            const text = document.getElementById('toastMessage');
+
+            text.textContent = message;
+            if (type === 'error') {
+                icon.className = 'fas fa-exclamation-circle toast-icon';
+                icon.style.color = '#ef4444';
+            } else {
+                icon.className = 'fas fa-check-circle toast-icon';
+                icon.style.color = '#0f9d58';
+            }
+
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2500);
+        }
+
+        // Log outputs into Settings Tab Console
+        function logSync(msg) {
+            const box = document.getElementById('syncLogs');
+            if (box) {
+                const now = new Date().toLocaleTimeString();
+                box.innerHTML += `<br>[${now}] ${msg}`;
+                box.scrollTop = box.scrollHeight;
+            }
+        }
+
+        // Tab views changer
+        function showTab(tab) {
+            activeTab = tab;
+
+            // Remove active classes
+            document.getElementById('tabPrograms').classList.remove('active');
+            document.getElementById('tabEmployees').classList.remove('active');
+            document.getElementById('tabLogs').classList.remove('active');
+
+            // Add active class
+            if (tab === 'programs') document.getElementById('tabPrograms').classList.add('active');
+            if (tab === 'employees') document.getElementById('tabEmployees').classList.add('active');
+            if (tab === 'logs') document.getElementById('tabLogs').classList.add('active');
+
+            // Hide or Show content tables
+            const progTable = document.getElementById('programsTable');
+            const empTable = document.getElementById('employeesTable');
+            const logsTable = document.getElementById('loginLogsTable');
+            const filterContainer = document.getElementById('logsFilterContainer');
+
+            progTable.style.display = tab === 'programs' ? 'table' : 'none';
+            empTable.style.display = tab === 'employees' ? 'table' : 'none';
+            logsTable.style.display = tab === 'logs' ? 'table' : 'none';
+            filterContainer.style.display = tab === 'logs' ? 'flex' : 'none';
+
+            // Reset active indicators
+            document.getElementById('formulaInput').value = '';
+            document.getElementById('activeCellLabel').textContent = 'A1';
+            selectedCell = null;
+
+            if (tab === 'logs') {
+                renderLogsSheet();
+            }
+        }
+
+        // Load data from LocalStorage or Backend server APIs
+        async function loadData() {
+            // First load local storage fallback
+            try {
+                const localCol = localStorage.getItem(STORAGE_COLLEGES);
+                colleges = localCol ? JSON.parse(localCol) : {};
+                const localEmp = localStorage.getItem(STORAGE_EMPLOYEES);
+                employees = localEmp ? JSON.parse(localEmp) : [];
+            } catch (err) {
+                console.warn('LocalStorage load failed', err);
+            }
+
+           // Attempt backend fetch
+try {
+    const res = await fetch(`${SERVER_BASE}/api/state`);
+    if (res.ok) {
+        const json = await res.json();
+        if (json && json.data) {
+            colleges = json.data.colleges || colleges;
+            employees = json.data.employees || employees;
+        }
+    }
+
+    // Load activity logs from server
+    await fetchActivityLogs();
+
+} catch (err) {
+    console.warn('Backend server state fetch unavailable', err);
+}
+
+// Refresh all sheets
+renderSpreadsheets();
+renderLogsSheet();
+
+            // Restore saved webhook URL into the settings input
+            const savedWebhook = localStorage.getItem(STORAGE_WEBHOOK);
+            const webhookInput = document.getElementById('webhookUrl');
+            if (savedWebhook && webhookInput) webhookInput.value = savedWebhook;
+        }
+
+        // Spreadsheet Column Letter Map (0 -> A, 1 -> B, 26 -> AA)
+        function getColumnLetter(index) {
+            let temp = "";
+            let letter = "";
+            while (index >= 0) {
+                temp = index % 26;
+                letter = String.fromCharCode(temp + 65) + letter;
+                index = Math.floor(index / 26) - 1;
+            }
+            return letter;
+        }
+
+        // Render grids and tables
+        function renderSpreadsheets() {
+            renderProgramsSheet();
+            renderEmployeesSheet();
+            renderLogsSheet();
+        }
+
+        // Tab 1: Render Programs Lifecycle Data
+        function renderProgramsSheet() {
+            const tableHeaders = document.getElementById('colHeaders');
+            const tableBody = document.getElementById('tableBody');
+
+            // Define sheet columns (A to S)
+            const headers = [
+                "Start Date", "College Name", "Created By", "Course", "Semester & Batch",
+                "Training Domain", "Training Dates", "Total Hours",
+                "Program Status", "Completed Items", "Pending Items", "Total Checklist Items", "Completion %",
+                "Abishith Rao (Author | Founder & CEO )", "Lilly John (Team HR)", "Sai Kumar (Team L&D)",
+                "Last Edited By", "Last Edited Timestamp", "Pending Fields"
+            ];
+
+            // Build A, B, C column headers
+            tableHeaders.innerHTML = '<th class="corner-cell"></th>';
+            headers.forEach((h, index) => {
+                tableHeaders.innerHTML += `<th style="width: 160px;">${getColumnLetter(index)}</th>`;
+            });
+
+            // Build descriptive headers row
+            let headerRow = `<tr class="header-row"><td class="row-number">1</td>`;
+            headers.forEach(h => {
+                headerRow += `<td class="data-cell" style="font-weight:bold; background-color:#e2efda; text-align:center;">${h}</td>`;
+            });
+            headerRow += '</tr>';
+
+            // Extract rows from database colleges/programs object
+            let rowNumber = 2;
+            let rowsHtml = '';
+
+            const list = [];
+            Object.values(colleges).forEach(college => {
+                Object.values(college.programs || {}).forEach(prog => {
+                    // Extract completion metrics
+                    const data = prog.formData || {};
+
+                    // Checklist total & completion computation
+                    let itemsCount = 0;
+                    let completeCount = 0;
+                    Object.keys(data).forEach(key => {
+                        // All checklist items follow structure e.g. "1A-1"
+                        if (/^\d[A-Z]-\d+$/.test(key)) {
+                            itemsCount++;
+                            if (data[key] === true) completeCount++;
+                        }
+                    });
+
+                    const percent = itemsCount ? Math.round((completeCount / itemsCount) * 100) : 0;
+
+                    // Extract signature completion status
+                    const sigSai = data['sig-sai'] ? `${data['sig-sai']} (${data['sig-sai-date'] || ''})` : 'Pending';
+                    const sigLilly = data['sig-lilly'] ? `${data['sig-lilly']} (${data['sig-lilly-date'] || ''})` : 'Pending';
+                    const sigAbishith = data['sig-abishith'] ? `${data['sig-abishith']} (${data['sig-abishith-date'] || ''})` : 'Pending';
+
+                    // Calculate dynamic status
+                    let statusText = 'Yet to start';
+                    let statusClass = 'yet-to-start';
+                    const allSigDone = !!(data['sig-sai'] && data['sig-lilly'] && data['sig-abishith']);
+
+                    if (allSigDone) {
+                        statusText = 'Completed';
+                        statusClass = 'complete';
+                    } else {
+                        let start = null;
+                        let end = null;
+                        if (data.rawStartDate) {
+                            start = new Date(data.rawStartDate);
+                        }
+                        if (data.rawEndDate) {
+                            end = new Date(data.rawEndDate);
+                        }
+                        if ((!start || isNaN(start.getTime())) && data.trainingDates) {
+                            const parts = data.trainingDates.split(' to ');
+                            if (parts.length === 2) {
+                                start = new Date(parts[0]);
+                                end = new Date(parts[1]);
+                            }
+                        }
+
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+                        if (start && !isNaN(start.getTime())) start.setHours(0, 0, 0, 0);
+                        if (end && !isNaN(end.getTime())) end.setHours(0, 0, 0, 0);
+
+                        if (end && !isNaN(end.getTime()) && today > end) {
+                            statusText = 'Pending';
+                            statusClass = 'pending';
+                        } else if (start && !isNaN(start.getTime()) && today < start) {
+                            statusText = 'Yet to start';
+                            statusClass = 'yet-to-start';
+                        } else {
+                            statusText = 'Ongoing';
+                            statusClass = 'ongoing';
+                        }
+                    }
+
+                    const item = {
+                        timestamp: prog.createdAt ? new Date(prog.createdAt).toLocaleString() : new Date().toLocaleString(),
+                        collegeName: college.name || data.collegeName || 'Unknown College',
+                        createdBy: college.createdBy || 'Admin',
+                        programName: prog.name || 'Unnamed Program',
+                        semesterBatch: data.semesterBatch || '',
+                        trainingDomain: data.trainingDomain || '',
+                        trainingDates: data.trainingDates || '',
+                        totalHours: data.totalHours || '',
+                        isArchived: prog.isArchived,
+                        completeCount: completeCount,
+                        pendingCount: itemsCount - completeCount,
+                        itemsCount: itemsCount,
+                        percent: percent + '%',
+                        percentNum: percent,
+                        sigSai: sigSai,
+                        sigLilly: sigLilly,
+                        sigAbishith: sigAbishith,
+                        lastEditedBy: data.lastEditedBy || 'N/A',
+                        lastEditedAt: data.lastEditedAt || 'N/A',
+                        unfilledFields: formatUnfilledFields(data.unfilledFields || 'None'),
+                        statusText: statusText,
+                        statusClass: statusClass
+                    };
+
+                    list.push(item);
+                });
+            });
+
+            // Order by timestamp descending
+            list.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+            // Filtering logic based on search
+            const filtered = list.filter(item => {
+                if (!searchQuery) return true;
+                const q = searchQuery.toLowerCase();
+                return (
+                    item.collegeName.toLowerCase().includes(q) ||
+                    item.programName.toLowerCase().includes(q) ||
+                    item.semesterBatch.toLowerCase().includes(q) ||
+                    item.trainingDomain.toLowerCase().includes(q)
+                );
+            });
+
+            filtered.forEach(item => {
+                rowsHtml += `
+                    <tr>
+                        <td class="row-number">${rowNumber}</td>
+                        <td class="data-cell" onclick="selectCell(this, 'A${rowNumber}')">${item.timestamp}</td>
+                        <td class="data-cell" onclick="selectCell(this, 'B${rowNumber}')">${item.collegeName}</td>
+                        <td class="data-cell" onclick="selectCell(this, 'C${rowNumber}')" style="color:#1e40af; font-weight:600;">${item.createdBy}</td>
+                        <td class="data-cell" onclick="selectCell(this, 'D${rowNumber}')">${item.programName}</td>
+                        <td class="data-cell" onclick="selectCell(this, 'E${rowNumber}')">${item.semesterBatch}</td>
+                        <td class="data-cell" onclick="selectCell(this, 'F${rowNumber}')">${item.trainingDomain}</td>
+                        <td class="data-cell" onclick="selectCell(this, 'G${rowNumber}')">${item.trainingDates}</td>
+                        <td class="data-cell" onclick="selectCell(this, 'H${rowNumber}')">${item.totalHours}</td>
+                        <td class="data-cell" onclick="selectCell(this, 'I${rowNumber}')" style="text-align:center;">
+                            <span class="status-pill ${item.statusClass}">${item.statusText}</span>
+                        </td>
+                        <td class="data-cell" onclick="selectCell(this, 'J${rowNumber}')" style="text-align:right;">${item.completeCount}</td>
+                        <td class="data-cell" onclick="selectCell(this, 'K${rowNumber}')" style="text-align:right;">${item.pendingCount}</td>
+                        <td class="data-cell" onclick="selectCell(this, 'L${rowNumber}')" style="text-align:right;">${item.itemsCount}</td>
+                        <td class="data-cell" onclick="selectCell(this, 'M${rowNumber}')" style="padding: 4px 8px;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <div style="flex: 1; height: 8px; background-color: #e8eaed; border-radius: 4px; overflow: hidden; min-width: 50px;">
+                                    <div style="width: ${item.percentNum}%; height: 100%; background-color: ${item.percentNum >= 80 ? '#137333' : item.percentNum >= 40 ? '#f4b400' : '#ef4444'}; border-radius: 4px;"></div>
+                                </div>
+                                <span style="font-weight: 500; font-size: 11px; min-width: 32px; text-align: right;">${item.percent}</span>
+                            </div>
+                        </td>
+                        <td class="data-cell" onclick="selectCell(this, 'N${rowNumber}')" style="color: ${item.sigAbishith === 'Pending' ? '#b06000' : '#137333'}">${item.sigAbishith}</td>
+                        <td class="data-cell" onclick="selectCell(this, 'O${rowNumber}')" style="color: ${item.sigLilly === 'Pending' ? '#b06000' : '#137333'}">${item.sigLilly}</td>
+                        <td class="data-cell" onclick="selectCell(this, 'P${rowNumber}')" style="color: ${item.sigSai === 'Pending' ? '#b06000' : '#137333'}">${item.sigSai}</td>
+                        <td class="data-cell" onclick="selectCell(this, 'Q${rowNumber}')">${item.lastEditedBy}</td>
+                        <td class="data-cell" onclick="selectCell(this, 'R${rowNumber}')">${item.lastEditedAt}</td>
+                        <td class="data-cell" onclick="selectCell(this, 'S${rowNumber}')" style="color: ${item.unfilledFields === 'None' ? '#137333' : '#ef4444'}">${item.unfilledFields}</td>
+                    </tr>
+                `;
+                rowNumber++;
+            });
+
+            // Pad with empty rows to simulate infinite grid
+            for (let r = rowNumber; r <= rowNumber + 20; r++) {
+                rowsHtml += `
+                    <tr>
+                        <td class="row-number">${r}</td>
+                        ${headers.map((h, i) => `<td class="data-cell" onclick="selectCell(this, '${getColumnLetter(i)}${r}')"></td>`).join('')}
+                    </tr>
+                `;
+            }
+
+            tableBody.innerHTML = headerRow + rowsHtml;
+            updateCharts(filtered);
+        }
+
+        // Tab 2: Render Employees Database Grid
+        function renderEmployeesSheet() {
+            const tableHeaders = document.getElementById('colHeadersEmp');
+            const tableBody = document.getElementById('tableBodyEmp');
+
+            const headers = ["Employee ID", "Employee Name"];
+
+            tableHeaders.innerHTML = '<th class="corner-cell"></th>';
+            headers.forEach((h, index) => {
+                tableHeaders.innerHTML += `<th style="width: 180px;">${getColumnLetter(index)}</th>`;
+            });
+
+            let headerRow = `<tr class="header-row"><td class="row-number">1</td>`;
+            headers.forEach(h => {
+                headerRow += `<td class="data-cell" style="font-weight:bold; background-color:#e8f0fe; text-align:center;">${h}</td>`;
+            });
+            headerRow += '</tr>';
+
+            let rowNumber = 2;
+            let rowsHtml = '';
+
+            const filtered = employees.filter(emp => {
+                const lowerId = emp.id.toLowerCase();
+                if (lowerId === 'admin' || lowerId === 'tech' || lowerId.endsWith('@atom.com') || lowerId.endsWith('@atomadmin')) return false;
+                if (!searchQuery) return true;
+                const q = searchQuery.toLowerCase();
+                return (
+                    emp.id.toLowerCase().includes(q) ||
+                    emp.name.toLowerCase().includes(q)
+                );
+            });
+
+            filtered.forEach(emp => {
+                rowsHtml += `
+                    <tr>
+                        <td class="row-number">${rowNumber}</td>
+                        <td class="data-cell" onclick="selectCell(this, 'A${rowNumber}')">${emp.id}</td>
+                        <td class="data-cell" onclick="selectCell(this, 'B${rowNumber}')">${emp.name}</td>
+                    </tr>
+                `;
+                rowNumber++;
+            });
+
+            // Pad with empty rows
+            for (let r = rowNumber; r <= rowNumber + 20; r++) {
+                rowsHtml += `
+                    <tr>
+                        <td class="row-number">${r}</td>
+                        ${headers.map((h, i) => `<td class="data-cell" onclick="selectCell(this, '${getColumnLetter(i)}${r}')"></td>`).join('')}
+                    </tr>
+                `;
+            }
+
+            tableBody.innerHTML = headerRow + rowsHtml;
+        }
+
+        async function fetchActivityLogs() {
+            try {
+                const res = await fetch(`${SERVER_BASE}/api/activity-logs`);
+                if (res.ok) {
+                    activityLogs = await res.json();
+                }
+            } catch (err) {
+                console.error("Failed to fetch activity logs:", err);
+            }
+        }
+
+        // Tab 3: Render Activity Logs Grid
+        async function renderLogsSheet() {
+            await fetchActivityLogs();
+
+            const tableHeaders = document.getElementById('colHeadersLogs');
+            const tableBody = document.getElementById('tableBodyLogs');
+
+            const headers = ["User ID", "Name", "Role", "Activity Event", "Timestamp"];
+
+            tableHeaders.innerHTML = '<th class="corner-cell"></th>';
+            headers.forEach((h, index) => {
+                tableHeaders.innerHTML += `<th style="width: 220px;">${getColumnLetter(index)}</th>`;
+            });
+
+            let headerRow = `<tr class="header-row"><td class="row-number">1</td>`;
+            headers.forEach(h => {
+                headerRow += `<td class="data-cell" style="font-weight:bold; background-color:#fef7e0; text-align:center;">${h}</td>`;
+            });
+            headerRow += '</tr>';
+
+            let rowNumber = 2;
+            let rowsHtml = '';
+
+            const filterUserId = document.getElementById('filterUserId') ? document.getElementById('filterUserId').value.toLowerCase().trim() : '';
+            const filterRole = document.getElementById('filterRole') ? document.getElementById('filterRole').value : '';
+            const filterEvent = document.getElementById('filterEvent') ? document.getElementById('filterEvent').value : '';
+
+            const filtered = activityLogs.filter(log => {
+                // Apply general search query filter
+                if (searchQuery) {
+                    const q = searchQuery.toLowerCase();
+                    const matchesSearch = (
+                        (log.userId && log.userId.toLowerCase().includes(q)) ||
+                        (log.userName && log.userName.toLowerCase().includes(q)) ||
+                        (log.role && log.role.toLowerCase().includes(q)) ||
+                        (log.eventType && log.eventType.toLowerCase().includes(q)) ||
+                        (log.timestamp && log.timestamp.includes(q))
+                    );
+                    if (!matchesSearch) return false;
+                }
+
+                // Apply log filters
+                if (filterUserId) {
+                    const matchesUser = (
+                        (log.userId && log.userId.toLowerCase().includes(filterUserId)) ||
+                        (log.userName && log.userName.toLowerCase().includes(filterUserId))
+                    );
+                    if (!matchesUser) return false;
+                }
+                if (filterRole) {
+                    if ((log.role || '').toLowerCase() !== filterRole.toLowerCase()) return false;
+                }
+                if (filterEvent) {
+                    if ((log.eventType || '').toLowerCase() !== filterEvent.toLowerCase()) return false;
+                }
+
+                return true;
+            });
+
+            filtered.forEach(log => {
+                const eventStyle = log.eventType === 'login' 
+                    ? 'color: #137333; font-weight: 600;' 
+                    : 'color: #d93025; font-weight: 600;';
+
+                rowsHtml += `
+                    <tr>
+                        <td class="row-number">${rowNumber}</td>
+                        <td class="data-cell" onclick="selectCell(this, 'A${rowNumber}')">${log.userId || ''}</td>
+                        <td class="data-cell" onclick="selectCell(this, 'B${rowNumber}')">${log.userName || ''}</td>
+                        <td class="data-cell" onclick="selectCell(this, 'C${rowNumber}')">${log.role || ''}</td>
+                        <td class="data-cell" onclick="selectCell(this, 'D${rowNumber}')" style="${eventStyle}">${(log.eventType || '').toUpperCase()}</td>
+                        <td class="data-cell" onclick="selectCell(this, 'E${rowNumber}')">${log.timestamp || ''}</td>
+                    </tr>
+                `;
+                rowNumber++;
+            });
+
+            // Pad with empty rows
+            for (let r = rowNumber; r <= rowNumber + 20; r++) {
+                rowsHtml += `
+                    <tr>
+                        <td class="row-number">${r}</td>
+                        ${headers.map((h, i) => `<td class="data-cell" onclick="selectCell(this, '${getColumnLetter(i)}${r}')"></td>`).join('')}
+                    </tr>
+                `;
+            }
+
+            tableBody.innerHTML = headerRow + rowsHtml;
+        }
+
+        // Cell selection mechanics
+        function selectCell(element, coordinate) {
+            // Remove previous active selection outline
+            document.querySelectorAll('.data-cell.selected').forEach(c => {
+                c.classList.remove('selected');
+            });
+
+            // Highlight selected cell
+            element.classList.add('selected');
+            selectedCell = element;
+
+            // Set indicators
+            document.getElementById('activeCellLabel').textContent = coordinate;
+            document.getElementById('formulaInput').value = element.textContent.trim();
+        }
+
+        // Handle Search queries
+        function handleSearch(val) {
+            searchQuery = val;
+            renderSpreadsheets();
+        }
+
+        // Export data to CSV File
+        function exportCSV() {
+            let csvContent = "data:text/csv;charset=utf-8,";
+
+            if (activeTab === 'programs') {
+                const headers = [
+                    "Start Date", "College Name", "Created By", "Course", "Semester/Batch",
+                    "Training Domain", "Training Dates", "Total Hours",
+                    "Program Status", "Completed Count", "Pending Count", "Total Count", "Completion %",
+                    "Abishith Rao (Author | Founder & CEO )", "lilly John (Team HR)", "Sai Kumar (Team L&D)",
+                    "Last Edited By", "Last Edited Timestamp", "Pending"
+                ];
+                csvContent += headers.map(h => `"${h}"`).join(",") + "\n";
+
+                Object.values(colleges).forEach(college => {
+                    Object.values(college.programs || {}).forEach(prog => {
+                        const data = prog.formData || {};
+                        let itemsCount = 0;
+                        let completeCount = 0;
+                        Object.keys(data).forEach(key => {
+                            if (/^\d[A-Z]-\d+$/.test(key)) {
+                                itemsCount++;
+                                if (data[key] === true) completeCount++;
+                            }
+                        });
+                        const percent = itemsCount ? Math.round((completeCount / itemsCount) * 100) : 0;
+
+                        // Calculate status
+                        let statusText = 'Yet to start';
+                        const allSigDone = !!(data['sig-sai'] && data['sig-lilly'] && data['sig-abishith']);
+                        if (allSigDone) {
+                            statusText = 'Completed';
+                        } else {
+                            let start = null;
+                            let end = null;
+                            if (data.rawStartDate) {
+                                start = new Date(data.rawStartDate);
+                            }
+                            if (data.rawEndDate) {
+                                end = new Date(data.rawEndDate);
+                            }
+                            if ((!start || isNaN(start.getTime())) && data.trainingDates) {
+                                const parts = data.trainingDates.split(' to ');
+                                if (parts.length === 2) {
+                                    start = new Date(parts[0]);
+                                    end = new Date(parts[1]);
+                                }
+                            }
+
+                            const today = new Date();
+                            today.setHours(0, 0, 0, 0);
+                            if (start && !isNaN(start.getTime())) start.setHours(0, 0, 0, 0);
+                            if (end && !isNaN(end.getTime())) end.setHours(0, 0, 0, 0);
+
+                            if (end && !isNaN(end.getTime()) && today > end) {
+                                statusText = 'Pending';
+                            } else if (start && !isNaN(start.getTime()) && today < start) {
+                                statusText = 'Yet to start';
+                            } else {
+                                statusText = 'Ongoing';
+                            }
+                        }
+
+                        const row = [
+                            prog.createdAt ? new Date(prog.createdAt).toISOString() : new Date().toISOString(),
+                            college.name || data.collegeName || 'Unknown',
+                            college.createdBy || 'Admin',
+                            prog.name || 'Unnamed',
+                            data.semesterBatch || '',
+                            data.trainingDomain || '',
+                            data.trainingDates || '',
+                            data.totalHours || '',
+                            statusText,
+                            completeCount,
+                            itemsCount - completeCount,
+                            itemsCount,
+                            percent + '%',
+                            data['sig-abishith'] || 'Pending',
+                            data['sig-lilly'] || 'Pending',
+                            data['sig-sai'] || 'Pending',
+                            data.lastEditedBy || 'N/A',
+                            data.lastEditedAt || 'N/A',
+                            formatUnfilledFields(data.unfilledFields || 'None')
+                        ];
+                        csvContent += row.map(v => `"${v}"`).join(",") + "\n";
+                    });
+                });
+            } else if (activeTab === 'employees') {
+                const headers = ["Employee ID", "Employee Name"];
+                csvContent += headers.map(h => `"${h}"`).join(",") + "\n";
+
+                employees.filter(emp => {
+                    const lowerId = emp.id.toLowerCase();
+                    return lowerId !== 'admin' && lowerId !== 'tech' && !lowerId.endsWith('@atom.com') && !lowerId.endsWith('@atomadmin');
+                }).forEach(emp => {
+                    const row = [
+                        emp.id,
+                        emp.name
+                    ];
+                    csvContent += row.map(v => `"${v}"`).join(",") + "\n";
+                });
+            } else if (activeTab === 'logs') {
+                const headers = ["User ID", "Name", "Role", "Activity Event", "Timestamp"];
+                csvContent += headers.map(h => `"${h}"`).join(",") + "\n";
+
+                activityLogs.forEach(log => {
+                    const row = [
+                        log.userId || '',
+                        log.userName || '',
+                        log.role || '',
+                        log.eventType || '',
+                        log.timestamp || ''
+                    ];
+                    csvContent += row.map(v => `"${v}"`).join(",") + "\n";
+                });
+            } else {
+                showToast("Cannot export settings to CSV", "error");
+                return;
+            }
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `ATOM_TMS_${activeTab}_export_${Date.now()}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast("CSV Download initiated successfully!");
+        }
+
+        // Webhook settings manager
+        function saveWebhookSettings() {
+            const url = document.getElementById('webhookUrl').value.trim();
+            if (!url) {
+                localStorage.removeItem(STORAGE_WEBHOOK);
+                showToast("Connection URL cleared");
+                logSync("[System] Webhook URL removed.");
+                return;
+            }
+            if (!url.startsWith('https://script.google.com/')) {
+                showToast("Must be a valid Google Script Web App URL", "error");
+                return;
+            }
+            localStorage.setItem(STORAGE_WEBHOOK, url);
+            showToast("Connection link saved!");
+            logSync(`[System] Deployed script mapped: ${url.substring(0, 40)}...`);
+        }
+
+        // Test webhook link connection
+        async function testWebhookConnection() {
+            const url = document.getElementById('webhookUrl').value.trim();
+            if (!url) {
+                showToast("Please enter a Webhook URL first", "error");
+                return;
+            }
+            logSync("[System] Pinging Apps Script webhook connection...");
+
+            const testPayload = {
+                collegeName: "Test College",
+                programName: "Connection Check",
+                semesterBatch: "TEST",
+                trainingDomain: "Technical",
+                trainingDates: "N/A",
+                totalHours: "0",
+                trainerTrainee: "N/A",
+                isArchived: false,
+                completionPercent: "100%",
+                sigSai: "TEST_SIGN_SAI",
+                sigLilly: "TEST_SIGN_LILLY",
+                sigAbishith: "TEST_SIGN_ABISHITH"
+            };
+
+            try {
+                // Apps Script runs as CORS-enabled web application.
+                // Since Google redirects Web App requests, we send as mode no-cors for checking network triggers,
+                // or standard fetch depending on client proxy setup.
+                const response = await fetch(url, {
+                    method: 'POST',
+                    mode: 'no-cors', // standard Apps Script POST redirection behavior
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(testPayload)
+                });
+
+                logSync("[Success] Test payload dispatched to Google Script Web App! Check your target spreadsheet for 'Connection Check' row.");
+                showToast("Test payload dispatched successfully!");
+            } catch (e) {
+                logSync(`[Error] Connection check failed: ${e.toString()}`);
+                showToast("Link test failed. Check console.", "error");
+            }
+        }
+
+        // Batch Sync all Local Data to Webhook Spreadsheet
+        async function syncAllToWebhook() {
+            const url = document.getElementById('webhookUrl').value.trim();
+            if (!url) {
+                showToast("Set up Webhook URL in Settings first", "error");
+                showTab('settings');
+                return;
+            }
+
+            const btn = document.getElementById('btnSyncTrigger');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Syncing...';
+
+            logSync("[System] Initiating database batch synchronization...");
+
+            // Accumulate programs
+            const programsList = [];
+            Object.values(colleges).forEach(college => {
+                Object.values(college.programs || {}).forEach(prog => {
+                    const data = prog.formData || {};
+                    let itemsCount = 0;
+                    let completeCount = 0;
+                    Object.keys(data).forEach(key => {
+                        if (/^\d[A-Z]-\d+$/.test(key)) {
+                            itemsCount++;
+                            if (data[key] === true) completeCount++;
+                        }
+                    });
+                    const percent = itemsCount ? Math.round((completeCount / itemsCount) * 100) : 0;
+
+                    // Calculate status
+                    let statusText = 'Yet to start';
+                    const allSigDone = !!(data['sig-sai'] && data['sig-lilly'] && data['sig-abishith']);
+                    if (allSigDone) {
+                        statusText = 'Completed';
+                    } else {
+                        let start = null;
+                        let end = null;
+                        if (data.rawStartDate) {
+                            start = new Date(data.rawStartDate);
+                        }
+                        if (data.rawEndDate) {
+                            end = new Date(data.rawEndDate);
+                        }
+                        if ((!start || isNaN(start.getTime())) && data.trainingDates) {
+                            const parts = data.trainingDates.split(' to ');
+                            if (parts.length === 2) {
+                                start = new Date(parts[0]);
+                                end = new Date(parts[1]);
+                            }
+                        }
+
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+                        if (start && !isNaN(start.getTime())) start.setHours(0, 0, 0, 0);
+                        if (end && !isNaN(end.getTime())) end.setHours(0, 0, 0, 0);
+
+                        if (end && !isNaN(end.getTime()) && today > end) {
+                            statusText = 'Pending';
+                        } else if (start && !isNaN(start.getTime()) && today < start) {
+                            statusText = 'Yet to start';
+                        } else {
+                            statusText = 'Ongoing';
+                        }
+                    }
+
+                    programsList.push({
+                        collegeName: college.name || data.collegeName || 'Unknown College',
+                        createdBy: college.createdBy || 'Admin',
+                        programName: prog.name || 'Unnamed Program',
+                        semesterBatch: data.semesterBatch || '',
+                        trainingDomain: data.trainingDomain || '',
+                        trainingDates: data.trainingDates || '',
+                        totalHours: data.totalHours || '',
+                        isArchived: prog.isArchived,
+                        completedCount: completeCount,
+                        pendingCount: itemsCount - completeCount,
+                        totalCount: itemsCount,
+                        completionPercent: percent + '%',
+                        sigSai: data['sig-sai'] || '',
+                        sigLilly: data['sig-lilly'] || '',
+                        sigAbishith: data['sig-abishith'] || '',
+                        statusText: statusText,
+                        lastEditedBy: data.lastEditedBy || 'N/A',
+                        lastEditedAt: data.lastEditedAt || 'N/A',
+                        unfilledFields: formatUnfilledFields(data.unfilledFields || 'None')
+                    });
+                });
+            });
+
+            if (programsList.length === 0) {
+                logSync("[Info] No programs found in database. Sync cancelled.");
+                showToast("No program rows to sync");
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-sync-alt"></i> Sync to Webhook';
+                return;
+            }
+
+            logSync(`[System] Bundling ${programsList.length} program rows...`);
+
+            let successCount = 0;
+            let errorCount = 0;
+
+            for (const item of programsList) {
+                try {
+                    await fetch(url, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(item)
+                    });
+                    successCount++;
+                    logSync(`[Sync] Sent program: "${item.programName}"`);
+                } catch (e) {
+                    errorCount++;
+                    logSync(`[Fail] Failed syncing: "${item.programName}" | Reason: ${e.toString()}`);
+                }
+            }
+
+            logSync(`[Finished] Batch operation complete. Success: ${successCount}, Failures: ${errorCount}`);
+            showToast(`Batch sync finished! Pushed ${successCount} rows.`);
+
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-sync-alt"></i> Sync to Webhook';
+        }
+
+        let itemsSummaryChartInstance = null;
+        let courseCompletionChartInstance = null;
+        let showAnalytics = false;
+
+        function toggleAnalytics() {
+            const sidebar = document.getElementById('analyticsSidebar');
+            showAnalytics = !showAnalytics;
+            if (showAnalytics) {
+                sidebar.classList.remove('collapsed');
+                renderProgramsSheet();
+            } else {
+                sidebar.classList.add('collapsed');
+            }
+        }
+
+        function updateCharts(list) {
+            if (!showAnalytics) return;
+
+            let totalCompleted = 0;
+            let totalPending = 0;
+            let totalPercentSum = 0;
+            let countWithChecklist = 0;
+
+            const courseNames = [];
+            const completionRates = [];
+
+            list.forEach(item => {
+                totalCompleted += item.completeCount;
+                totalPending += item.pendingCount;
+                if (item.itemsCount > 0) {
+                    totalPercentSum += item.percentNum;
+                    countWithChecklist++;
+                }
+                courseNames.push(item.programName.substring(0, 15) + (item.programName.length > 15 ? '...' : ''));
+                completionRates.push(item.percentNum);
+            });
+
+            const avgCompletion = countWithChecklist ? Math.round(totalPercentSum / countWithChecklist) : 0;
+            document.getElementById('avgCompletionVal').textContent = avgCompletion + '%';
+
+            // Completed vs Pending Doughnut Chart
+            const ctxSummary = document.getElementById('itemsSummaryChart').getContext('2d');
+            if (itemsSummaryChartInstance) {
+                itemsSummaryChartInstance.destroy();
+            }
+            itemsSummaryChartInstance = new Chart(ctxSummary, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Completed', 'Pending'],
+                    datasets: [{
+                        data: [totalCompleted, totalPending],
+                        backgroundColor: ['#137333', '#ef4444'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                boxWidth: 12,
+                                font: { size: 11 }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Course Completion Bar Chart
+            const ctxCourse = document.getElementById('courseCompletionChart').getContext('2d');
+            if (courseCompletionChartInstance) {
+                courseCompletionChartInstance.destroy();
+            }
+            courseCompletionChartInstance = new Chart(ctxCourse, {
+                type: 'bar',
+                data: {
+                    labels: courseNames,
+                    datasets: [{
+                        label: 'Completion %',
+                        data: completionRates,
+                        backgroundColor: '#1a73e8',
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                callback: function (value) { return value + '%'; },
+                                font: { size: 10 }
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                font: { size: 9 },
+                                maxRotation: 45,
+                                minRotation: 45
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+
+        // Initialize script on startup
+        window.addEventListener('DOMContentLoaded', () => {
+            loadData();
+        });
+
+        // Activity Log Filter Functions
+        function applyActivityLogFilter() {
+            renderLogsSheet();
+        }
+
+        function clearActivityLogFilter() {
+            const uInput = document.getElementById('filterUserId');
+            const rSelect = document.getElementById('filterRole');
+            const eSelect = document.getElementById('filterEvent');
+            if (uInput) uInput.value = '';
+            if (rSelect) rSelect.value = '';
+            if (eSelect) eSelect.value = '';
+            renderLogsSheet();
+        }
+
+        // Store activity log data when fetched
+        window.activityLogDataCache = (data) => {
+            // Keep for potential legacy integrations
+        };
+    </script>
+</body>
+
+</html>

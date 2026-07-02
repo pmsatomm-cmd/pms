@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ATOM Training System - Login</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=10" />
+</head>
+
+<body class="login-page-body">
+
+    <div id="loginPage" class="login-split-container">
+        <!-- Mobile Login Button (Top Right) -->
+        <button class="mobile-login-btn" onclick="scrollToLoginForm()">
+            <i class="fas fa-sign-in-alt"></i> Login
+        </button>
+
+        <!-- Left Side: Brand presentation -->
+        <div class="login-left-brand">
+            <div class="brand-graphics-left">
+                <!-- Diagonal stripes and grid background are implemented in CSS -->
+            </div>
+
+            <div class="login-brand-inner">
+                <div class="brand-logo-row">
+                    <img src="atom.png?v=3" alt="ATOM Logo" class="brand-logo-image-left" />
+                </div>
+                <h1 class="brand-subtitle-main">
+                    PROJECT MANAGEMENT<br>
+                    <span class="system-word">SYSTEM</span>
+                </h1>
+                <div class="brand-tagline-subtitle">
+                    <span class="tagline-line"></span>
+                    PROCESS DOCUMENTATION : <span class="tagline-end">END -TO -END</span> PROCESS
+                </div>
+
+                <div class="brand-features-list">
+                    <div class="feature-item-row">
+                        <div class="feature-icon-circle">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                            </svg>
+                        </div>
+                        <div class="feature-content-info">
+                            <h3>Secure Access</h3>
+                            <p>Enterprise-grade security to protect your data</p>
+                        </div>
+                    </div>
+                    <div class="feature-item-row">
+                        <div class="feature-icon-circle">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                <polyline points="14 2 14 8 20 8" />
+                                <line x1="16" y1="13" x2="8" y2="13" />
+                                <line x1="16" y1="17" x2="8" y2="17" />
+                                <polyline points="10 9 9 9 8 9" />
+                            </svg>
+                        </div>
+                        <div class="feature-content-info">
+                            <h3>Streamlined Process</h3>
+                            <p>End-to-end documentation made simple</p>
+                        </div>
+                    </div>
+                    <div class="feature-item-row">
+                        <div class="feature-icon-circle">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                                <circle cx="9" cy="7" r="4" />
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                            </svg>
+                        </div>
+                        <div class="feature-content-info">
+                            <h3>Collaborative Work</h3>
+                            <p>Work together seamlessly across your organization</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="brand-illustration-container">
+                    <img src="shield_graphic.png?v=2" alt="Security Illustration" class="brand-illustration-img" />
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Right Side: Login Card Floating -->
+        <div class="login-right-card-wrapper">
+            <div class="dot-grid-bottom-right"></div>
+            <div class="dot-grid-top-left"></div>
+
+            <div class="login-card-floating">
+                <!-- ATOM Logo centered at top -->
+                <div class="login-card-logo">
+                    <img src="logo.png" alt="ATOM Logo" class="brand-logo-image-card" />
+                </div>
+
+                <!-- Normal Login Container -->
+                <div id="normalLoginContainer">
+                    <div class="welcome-badge-row">
+                        <span class="welcome-badge">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#008037"
+                                stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                                <path d="M9 11l2 2 4-4" />
+                            </svg>
+                        </span>
+                    </div>
+                    <h2 class="welcome-title">WELCOME BACK</h2>
+                    <p class="welcome-subtitle">Sign in to continue to your account</p>
+
+                    <!-- Login Fields Group -->
+                    <div id="loginFields">
+                        <div class="field login-form-field" id="loginUsernameField">
+                            <label for="loginIdentifier" class="field-label">USERNAME OR EMPLOYEE ID</label>
+                            <div class="input-icon-group">
+                                <span class="input-badge user-badge">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#008037"
+                                        stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                                        <circle cx="12" cy="7" r="4" />
+                                    </svg>
+                                </span>
+                                <input type="text" id="loginIdentifier" class="form-input" value="admin"
+                                    placeholder="Enter username or employee id"
+                                    onkeypress="if(event.key==='Enter') loginPageLogin()" />
+                            </div>
+                        </div>
+                        <div class="field login-form-field" id="loginPasswordFieldContainer">
+                            <label for="loginPassword" class="field-label">PASSWORD</label>
+                            <div class="input-icon-group">
+                                <span class="input-badge lock-badge">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#008037"
+                                        stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                                        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                                    </svg>
+                                </span>
+                                <input type="password" id="loginPassword" class="form-input" value=""
+                                    placeholder="••••••••" onkeypress="if(event.key==='Enter') loginPageLogin()" />
+                                <i class="far fa-eye eye-toggle-icon" id="eyeToggle"
+                                    onclick="togglePasswordVisibility('loginPassword', 'eyeToggle')"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Remember me and Forgot Password row -->
+                    <div class="login-meta-row">
+                        <label class="remember-me-container">
+                            <input type="checkbox" id="rememberMe" checked />
+                            <span class="remember-me-checkbox"></span>
+                            Remember me
+                        </label>
+                        <a href="#" onclick="showForgotPassword()" class="forgot-password-link">Forgot Password?</a>
+                    </div>
+
+                    <!-- Submit Action -->
+                    <div class="login-actions">
+                        <button class="btn-login-submit" onclick="loginPageLogin()">
+                            <span>SIGN IN TO SYSTEM &nbsp;&rarr;</span>
+                        </button>
+                    </div>
+
+                    <!-- Centered OR Separator -->
+                    <div class="login-or-separator">
+                        <span class="separator-line"></span>
+                        <span class="separator-text">OR</span>
+                        <span class="separator-line"></span>
+                    </div>
+
+                    <!-- First Time Login Row -->
+                    <div class="first-time-login-row">
+                        <a href="#" onclick="showFirstTimeLogin()" class="first-time-login-link">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+                                class="first-time-icon">
+                                <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+                                <line x1="8" y1="21" x2="16" y2="21" />
+                                <line x1="12" y1="17" x2="12" y2="21" />
+                            </svg>
+                            First Time Login
+                        </a>
+                    </div>
+                </div>
+
+                <!-- First Time Login Fields -->
+                <div id="firstTimeLoginFields" style="display: none;">
+                    <h3 class="form-section-title"
+                        style="font-size:18px; font-weight:700; color:#1e293b; margin-bottom:15px; text-align:center;">
+                        First Time Login</h3>
+                    <div class="field login-form-field">
+                        <label for="ftEmployeeId" class="field-label">Employee ID</label>
+                        <div class="input-icon-group">
+                            <span class="input-badge user-badge">
+                                <i class="far fa-user input-badge-icon"></i>
+                            </span>
+                            <input type="text" id="ftEmployeeId" class="form-input" placeholder="e.g. EMP000245"
+                                onkeypress="if(event.key==='Enter') verifyFirstTimeLogin()" />
+                        </div>
+                    </div>
+                    <div class="field login-form-field">
+                        <label for="ftEmployeeName" class="field-label">Employee Name</label>
+                        <div class="input-icon-group">
+                            <span class="input-badge user-badge">
+                                <i class="far fa-user input-badge-icon"></i>
+                            </span>
+                            <input type="text" id="ftEmployeeName" class="form-input" placeholder="e.g. John David"
+                                onkeypress="if(event.key==='Enter') verifyFirstTimeLogin()" />
+                        </div>
+                    </div>
+                    <div class="field login-form-field">
+                        <label for="ftActivationCode" class="field-label">Activation Code</label>
+                        <div class="input-icon-group">
+                            <span class="input-badge lock-badge">
+                                <i class="fas fa-key input-badge-icon"></i>
+                            </span>
+                            <input type="text" id="ftActivationCode" class="form-input" placeholder="X7P9-K2LM"
+                                onkeypress="if(event.key==='Enter') verifyFirstTimeLogin()" />
+                        </div>
+                    </div>
+                    <div class="login-actions">
+                        <button class="btn-login-submit" onclick="verifyFirstTimeLogin()">
+                            <span>Verify &nbsp;&rarr;</span>
+                        </button>
+                    </div>
+                    <div class="back-link-container">
+                        <a href="#" onclick="showNormalLogin()" class="login-link-back">&larr; Back to Sign In</a>
+                    </div>
+                </div>
+
+                <!-- Create Password Fields -->
+                <div id="createPasswordFields" style="display: none;">
+                    <h3 class="form-section-title"
+                        style="font-size:18px; font-weight:700; color:#1e293b; margin-bottom:5px; text-align:center;">
+                        Create Password</h3>
+                    <p class="form-section-desc"
+                        style="font-size:13px; color:#64748b; margin-bottom:15px; text-align:center;">Create your
+                        password to activate your account.</p>
+                    <div class="field login-form-field">
+                        <label for="newPassword" class="field-label">New Password</label>
+                        <div class="input-icon-group">
+                            <span class="input-badge lock-badge">
+                                <i class="fas fa-lock input-badge-icon"></i>
+                            </span>
+                            <input type="password" id="newPassword" class="form-input" placeholder="New Password"
+                                onkeypress="if(event.key==='Enter') submitCreatePassword()" />
+                        </div>
+                    </div>
+                    <div class="field login-form-field">
+                        <label for="confirmPassword" class="field-label">Confirm Password</label>
+                        <div class="input-icon-group">
+                            <span class="input-badge lock-badge">
+                                <i class="fas fa-lock input-badge-icon"></i>
+                            </span>
+                            <input type="password" id="confirmPassword" class="form-input"
+                                placeholder="Confirm Password"
+                                onkeypress="if(event.key==='Enter') submitCreatePassword()" />
+                        </div>
+                    </div>
+                    <div class="login-actions">
+                        <button class="btn-login-submit" onclick="submitCreatePassword()">
+                            <span>Create Account &nbsp;&rarr;</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Forgot Password Fields (Bypassed but kept for ID compatibility) -->
+                <div id="forgotPasswordFields" style="display: none;">
+                    <h3 class="form-section-title"
+                        style="font-size:18px; font-weight:700; color:#1e293b; margin-bottom:15px; text-align:center;">
+                        Forgot Password</h3>
+                    <div class="field login-form-field">
+                        <label for="forgotEmployeeId" class="field-label">Employee ID</label>
+                        <div class="input-icon-group">
+                            <span class="input-badge user-badge">
+                                <i class="far fa-user input-badge-icon"></i>
+                            </span>
+                            <input type="text" id="forgotEmployeeId" class="form-input" placeholder="e.g. EMP000245"
+                                onkeypress="if(event.key==='Enter') requestResetPassword()" />
+                        </div>
+                    </div>
+                    <div class="field login-form-field">
+                        <label for="forgotEmployeeName" class="field-label">Employee Name</label>
+                        <div class="input-icon-group">
+                            <span class="input-badge user-badge">
+                                <i class="far fa-user input-badge-icon"></i>
+                            </span>
+                            <input type="text" id="forgotEmployeeName" class="form-input" placeholder="e.g. John David"
+                                onkeypress="if(event.key==='Enter') requestResetPassword()" />
+                        </div>
+                    </div>
+                    <div id="resetRequestMsgBox" class="info-msg-box" style="display: none;">
+                        Please contact your administrator to obtain a password reset code.
+                    </div>
+                    <div class="login-actions" id="forgotPassSubmitBtnContainer">
+                        <button class="btn-login-submit" onclick="requestResetPassword()">
+                            <span>Request Reset &nbsp;&rarr;</span>
+                        </button>
+                    </div>
+                    <div class="login-actions" id="forgotPassNextBtnContainer" style="display: none;">
+                        <button class="btn-login-submit" onclick="showResetCodeVerification()">
+                            <span>Enter Reset Code &nbsp;&rarr;</span>
+                        </button>
+                    </div>
+                    <div class="back-link-container">
+                        <a href="#" onclick="showNormalLogin()" class="login-link-back">&larr; Back to Sign In</a>
+                    </div>
+                </div>
+
+                <!-- Reset Verification Fields -->
+                <div id="resetVerificationFields" style="display: none;">
+                    <h3 class="form-section-title"
+                        style="font-size:18px; font-weight:700; color:#1e293b; margin-bottom:5px; text-align:center;">
+                        Verify Reset Code</h3>
+                    <p class="form-section-desc"
+                        style="color: #64748b; font-size: 13px; margin-bottom: 15px; line-height: 1.5; text-align:center;">
+                        Please enter the reset code provided by your administrator. If you do not have a code, please
+                        contact your administrator to get one.
+                    </p>
+                    <div class="field login-form-field">
+                        <label for="resetEmployeeId" class="field-label">Employee ID</label>
+                        <div class="input-icon-group">
+                            <span class="input-badge user-badge">
+                                <i class="far fa-user input-badge-icon"></i>
+                            </span>
+                            <input type="text" id="resetEmployeeId" class="form-input" placeholder="e.g. EMP000245"
+                                onkeypress="if(event.key==='Enter') verifyResetCode()" />
+                        </div>
+                    </div>
+                    <div class="field login-form-field">
+                        <label for="resetEmployeeName" class="field-label">Employee Name</label>
+                        <div class="input-icon-group">
+                            <span class="input-badge user-badge">
+                                <i class="far fa-user input-badge-icon"></i>
+                            </span>
+                            <input type="text" id="resetEmployeeName" class="form-input" placeholder="e.g. John David"
+                                onkeypress="if(event.key==='Enter') verifyResetCode()" />
+                        </div>
+                    </div>
+                    <div class="field login-form-field">
+                        <label for="resetCodeInput" class="field-label">Reset Code</label>
+                        <div class="input-icon-group">
+                            <span class="input-badge lock-badge">
+                                <i class="fas fa-key input-badge-icon"></i>
+                            </span>
+                            <input type="text" id="resetCodeInput" class="form-input" placeholder="R5K8-PQ27"
+                                onkeypress="if(event.key==='Enter') verifyResetCode()" />
+                        </div>
+                    </div>
+                    <div class="login-actions">
+                        <button class="btn-login-submit" onclick="verifyResetCode()">
+                            <span>Verify &nbsp;&rarr;</span>
+                        </button>
+                    </div>
+                    <div class="back-link-container">
+                        <a href="#" onclick="showNormalLogin()" class="login-link-back">&larr; Back to Sign In</a>
+                    </div>
+                </div>
+
+                <!-- Reset Create Password Fields -->
+                <div id="resetCreatePasswordFields" style="display: none;">
+                    <h3 class="form-section-title"
+                        style="font-size:18px; font-weight:700; color:#1e293b; margin-bottom:5px; text-align:center;">
+                        Reset Password</h3>
+                    <p class="form-section-desc"
+                        style="font-size:13px; color:#64748b; margin-bottom:15px; text-align:center;">Create your new
+                        password below.</p>
+                    <div class="field login-form-field">
+                        <label for="resetNewPassword" class="field-label">New Password</label>
+                        <div class="input-icon-group">
+                            <span class="input-badge lock-badge">
+                                <i class="fas fa-lock input-badge-icon"></i>
+                            </span>
+                            <input type="password" id="resetNewPassword" class="form-input" placeholder="New Password"
+                                onkeypress="if(event.key==='Enter') submitResetPassword()" />
+                        </div>
+                    </div>
+                    <div class="field login-form-field">
+                        <label for="resetConfirmPassword" class="field-label">Confirm Password</label>
+                        <div class="input-icon-group">
+                            <span class="input-badge lock-badge">
+                                <i class="fas fa-lock input-badge-icon"></i>
+                            </span>
+                            <input type="password" id="resetConfirmPassword" class="form-input"
+                                placeholder="Confirm Password"
+                                onkeypress="if(event.key==='Enter') submitResetPassword()" />
+                        </div>
+                    </div>
+                    <div class="login-actions">
+                        <button class="btn-login-submit" onclick="submitResetPassword()">
+                            <span>Reset Password &nbsp;&rarr;</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Footnote / System Info -->
+                <div class="login-card-footer-info">
+                    VERSION 2.4.0 &nbsp;&bull;&nbsp; AUTHORIZED PERSONNEL ONLY
+                </div>
+            </div>
+
+            <!-- Custom Toast Message -->
+            <div id="loginToast" class="login-toast">
+                <i class="fas fa-check-circle toast-icon"></i>
+                <span id="toastMsg">Login successful</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Password visibility toggle script -->
+    <script>
+        function togglePasswordVisibility(inputId, eyeIconId) {
+            const pwdInput = document.getElementById(inputId);
+            const eyeIcon = document.getElementById(eyeIconId);
+            if (pwdInput && eyeIcon) {
+                if (pwdInput.type === 'password') {
+                    pwdInput.type = 'text';
+                    eyeIcon.classList.remove('fa-eye');
+                    eyeIcon.classList.add('fa-eye-slash');
+                    eyeIcon.style.color = '#008037';
+                } else {
+                    pwdInput.type = 'password';
+                    eyeIcon.classList.remove('fa-eye-slash');
+                    eyeIcon.classList.add('fa-eye');
+                    eyeIcon.style.color = '#a0aec0';
+                }
+            }
+        }
+    </script>
+
+    <!-- App Logic -->
+    <script src="app.js"></script>
+</body>
+
+</html>

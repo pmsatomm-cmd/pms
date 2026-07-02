@@ -1,0 +1,61 @@
+-- MySQL database setup for Training Management System
+-- Username: root
+-- Password: 12345
+
+CREATE DATABASE IF NOT EXISTS training_management;
+USE training_management;
+CREATE USER IF NOT EXISTS 'root'@'localhost' IDENTIFIED BY '12345';
+GRANT ALL PRIVILEGES ON training_management.* TO 'root'@'localhost';
+FLUSH PRIVILEGES;
+
+CREATE TABLE IF NOT EXISTS users (
+    id VARCHAR(64) PRIMARY KEY,
+    role ENUM('admin','employee') NOT NULL,
+    employee_id VARCHAR(64) UNIQUE,
+    name VARCHAR(255) NOT NULL,
+    designation VARCHAR(255),
+    department VARCHAR(255),
+    password VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS colleges (
+    id VARCHAR(64) PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS programs (
+    id VARCHAR(64) PRIMARY KEY,
+    college_id VARCHAR(64) NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    semester_batch VARCHAR(255),
+    training_domain TEXT,
+    training_dates VARCHAR(255),
+    total_hours VARCHAR(64),
+    trainer_trainee VARCHAR(255),
+    is_archived BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (college_id) REFERENCES colleges(id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS program_form_entries (
+    id VARCHAR(128) PRIMARY KEY,
+    program_id VARCHAR(64) NOT NULL,
+    user_id VARCHAR(64),
+    data JSON NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY ux_program_user (program_id, user_id),
+    FOREIGN KEY (program_id) REFERENCES programs(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS app_state (
+    id VARCHAR(32) PRIMARY KEY,
+    data JSON NOT NULL,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
