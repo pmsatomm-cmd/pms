@@ -1837,7 +1837,7 @@ body {
 
 /* Login Body Styling */
 .login-page-body {
-    font-family: 'Poppins', 'Outfit', sans-serif;
+    font-family: 'Century Gothic', 'CenturyGothic', 'AppleGothic', sans-serif;
     min-height: 100vh;
     margin: 0;
     padding: 0;
@@ -1988,7 +1988,7 @@ body {
     letter-spacing: 1px;
     margin: 0;
     text-transform: uppercase;
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Century Gothic';
 }
 
 .tagline-line {
@@ -2038,7 +2038,7 @@ body {
     font-weight: 600;
     color: #ffffff;
     margin: 0 0 3px 0;
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Century Gothic';
 }
 
 .feature-content-info p {
@@ -2046,14 +2046,14 @@ body {
     color: #94a3b8;
     margin: 0;
     line-height: 1.45;
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Century Gothic';
 }
 
 /* Illustration Container */
 .brand-illustration-container {
     position: absolute;
-    left: 19%;
-    bottom: 09%;
+    left: 20.4%;
+    bottom: 15%;
     width: min(27vw, 360px);
     display: flex;
     flex-direction: column;
@@ -2071,7 +2071,7 @@ body {
 }
 
 .brand-illustration-img {
-    width: 100%;
+    width: 90%;
     max-width: 100%;
     height: auto;
     object-fit: contain;
@@ -2122,19 +2122,115 @@ body {
 }
 
 .login-card-floating {
-    background: rgba(255, 255, 255, 0.98);
-    border-radius: 18px;
-    padding: 34px 32px 30px;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(245, 250, 248, 0.95) 100%);
+    border-radius: 28px;
+    padding: 36px 34px 32px;
     width: 100%;
     max-width: 430px;
-    box-shadow: 0 18px 50px rgba(15, 23, 42, 0.12);
-    border: 1px solid rgba(226, 232, 240, 0.92);
+    box-shadow:
+        0 28px 70px rgba(15, 23, 42, 0.18),
+        0 2px 0 rgba(255, 255, 255, 0.85) inset,
+        0 -18px 40px rgba(255, 255, 255, 0.45) inset;
+    border: 1px solid rgba(255, 255, 255, 0.72);
     position: relative;
     z-index: 10;
     display: flex;
     flex-direction: column;
-    margin-left: 530px;
+    margin-left: 600px;
+    overflow: hidden;
+    isolation: isolate;
+    backdrop-filter: blur(18px) saturate(165%);
+    -webkit-backdrop-filter: blur(18px) saturate(165%);
+    font-family: 'Century Gothic';
     animation: loginFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.login-card-floating::before {
+    content: '';
+    position: absolute;
+    inset: -42% 18% auto -16%;
+    height: 220px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.88) 0%, rgba(255, 255, 255, 0.28) 38%, rgba(255, 255, 255, 0) 72%);
+    transform: rotate(-14deg);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.login-card-floating::after {
+    content: '';
+    position: absolute;
+    inset: auto -30% -36% 42%;
+    height: 220px;
+    background: radial-gradient(circle, rgba(0, 176, 80, 0.18) 0%, rgba(0, 128, 55, 0.08) 32%, rgba(0, 128, 55, 0) 72%);
+    filter: blur(14px);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.login-card-floating > * {
+    position: relative;
+    z-index: 1;
+}
+
+#normalLoginContainer {
+    display: flex;
+    flex-direction: column;
+}
+
+#normalLoginContainer > * {
+    animation: formRiseIn 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+#normalLoginContainer .welcome-title {
+    animation-delay: 0.05s;
+}
+
+#normalLoginContainer .welcome-subtitle {
+    animation-delay: 0.12s;
+}
+
+#normalLoginContainer #loginFields {
+    animation-delay: 0.18s;
+}
+
+#normalLoginContainer .login-meta-row {
+    animation-delay: 0.24s;
+}
+
+#normalLoginContainer .login-actions {
+    animation-delay: 0.3s;
+}
+
+#normalLoginContainer .login-or-separator {
+    animation-delay: 0.36s;
+}
+
+#normalLoginContainer .first-time-login-row {
+    animation-delay: 0.42s;
+}
+
+.login-form-field {
+    animation: fieldLift 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.login-form-field:nth-child(1) {
+    animation-delay: 0.16s;
+}
+
+.login-form-field:nth-child(2) {
+    animation-delay: 0.22s;
+}
+
+.login-meta-row,
+.login-actions,
+.login-or-separator,
+.first-time-login-row {
+    will-change: transform, opacity;
+}
+
+.login-card-floating::after {
+    animation: cardGlowFloat 5.5s ease-in-out infinite;
 }
 
 @keyframes loginFadeIn {
@@ -2149,6 +2245,79 @@ body {
     }
 }
 
+@keyframes formRiseIn {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fieldLift {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes cardGlowFloat {
+    0%,
+    100% {
+        transform: translate3d(0, 0, 0) scale(1);
+        opacity: 0.92;
+    }
+
+    50% {
+        transform: translate3d(0, -8px, 0) scale(1.03);
+        opacity: 1;
+    }
+}
+
+@keyframes logoFloat {
+    0%,
+    100% {
+        transform: translateY(0) scale(1) rotate(0deg);
+        filter: drop-shadow(0 10px 18px rgba(0, 128, 55, 0.16));
+    }
+
+    25% {
+        transform: translateY(-4px) scale(1.01) rotate(-1deg);
+        filter: drop-shadow(0 14px 22px rgba(0, 128, 55, 0.2));
+    }
+
+    50% {
+        transform: translateY(-7px) scale(1.02) rotate(0deg);
+        filter: drop-shadow(0 16px 26px rgba(0, 128, 55, 0.24));
+    }
+
+    75% {
+        transform: translateY(-4px) scale(1.01) rotate(1deg);
+        filter: drop-shadow(0 14px 22px rgba(0, 128, 55, 0.2));
+    }
+}
+
+@keyframes logoGlowPulse {
+    0%,
+    100% {
+        transform: scale(0.96);
+        opacity: 0.65;
+    }
+
+    50% {
+        transform: scale(1.08);
+        opacity: 1;
+    }
+}
+
 /* Card Logo row */
 .login-card-logo {
     display: flex;
@@ -2156,6 +2325,7 @@ body {
     justify-content: center;
     gap: 10px;
     margin-bottom: 16px;
+    position: relative;
 }
 
 /* Brand Logo Image (Left Column) */
@@ -2170,6 +2340,25 @@ body {
     height: 100px;
     width: auto;
     object-fit: contain;
+    display: block;
+    position: relative;
+    z-index: 1;
+    transform-origin: center;
+    filter: drop-shadow(0 10px 18px rgba(0, 128, 55, 0.16));
+    animation: logoFloat 4.8s ease-in-out infinite;
+    will-change: transform, filter;
+}
+
+.login-card-logo::before {
+    content: '';
+    position: absolute;
+    width: 92px;
+    height: 92px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0, 176, 80, 0.18) 0%, rgba(0, 176, 80, 0.08) 38%, rgba(0, 176, 80, 0) 72%);
+    filter: blur(6px);
+    z-index: 0;
+    animation: logoGlowPulse 4.8s ease-in-out infinite;
 }
 
 /* Welcome Badge Row */
@@ -2196,7 +2385,7 @@ body {
     text-align: center;
     margin: 0 0 4px 0;
     letter-spacing: 0.5px;
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Century Gothic';
 }
 
 .welcome-subtitle {
@@ -2204,7 +2393,7 @@ body {
     color: #64748b;
     text-align: center;
     margin: 0 0 16px 0;
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Century Gothic';
 }
 
 /* Fields Styling */
@@ -2220,7 +2409,7 @@ body {
     text-transform: uppercase;
     margin-bottom: 8px;
     letter-spacing: 0.5px;
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Century Gothic';
 }
 
 .input-icon-group {
@@ -2232,23 +2421,27 @@ body {
 
 .form-input {
     width: 100%;
-    background: #ffffff !important;
-    border: 1px solid #cbd5e1 !important;
-    border-radius: 10px !important;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(245, 249, 247, 0.96) 100%) !important;
+    border: 1px solid rgba(0, 128, 55, 0.12) !important;
+    border-radius: 14px !important;
     padding: 14px 16px 14px 44px !important;
     height: 50px !important;
     color: #111827 !important;
     font-size: 14px !important;
-    font-family: 'Poppins', sans-serif !important;
+    font-family: 'Century Gothic' !important;
     transition: all 0.2s ease !important;
     outline: none !important;
-    box-shadow: none !important;
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.85) inset,
+        0 8px 18px rgba(15, 23, 42, 0.04) !important;
     font-weight: 500 !important;
 }
 
 .form-input:focus {
-    border-color: #008037 !important;
-    box-shadow: 0 0 0 3px rgba(0, 128, 55, 0.1) !important;
+    border-color: #00a24a !important;
+    box-shadow:
+        0 0 0 4px rgba(0, 128, 55, 0.1) !important,
+        0 1px 0 rgba(255, 255, 255, 0.85) inset !important;
 }
 
 .input-badge {
@@ -2285,7 +2478,7 @@ body {
     margin-top: 10px;
     margin-bottom: 16px;
     font-size: 13.5px;
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Century Gothic';
 }
 
 .remember-me-container {
@@ -2365,12 +2558,14 @@ body {
 /* Login Submit Button */
 .btn-login-submit {
     width: 100%;
-    background: linear-gradient(135deg, #008037 0%, #006837 100%);
-    border: none;
-    border-radius: 10px;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.26) 0%, rgba(255, 255, 255, 0) 24%),
+        linear-gradient(180deg, #14bb5a 0%, #008f3e 46%, #007334 100%);
+    border: 1px solid rgba(255, 255, 255, 0.32);
+    border-radius: 14px;
     height: 50px;
     color: #ffffff;
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Century Gothic';
     font-size: 14px;
     font-weight: 700;
     text-transform: uppercase;
@@ -2381,17 +2576,132 @@ body {
     justify-content: center;
     gap: 8px;
     transition: all 0.2s ease;
-    box-shadow: 0 4px 12px rgba(0, 128, 55, 0.2);
+    box-shadow:
+        0 14px 30px rgba(0, 128, 55, 0.32),
+        0 2px 0 rgba(255, 255, 255, 0.32) inset,
+        0 -10px 18px rgba(0, 0, 0, 0.08) inset;
+    position: relative;
+    overflow: hidden;
+    animation: signInButtonPulse 2.6s ease-in-out infinite;
+}
+
+.btn-login-submit::before {
+    content: '';
+    position: absolute;
+    inset: -20% -35%;
+    background:
+        linear-gradient(120deg,
+            rgba(255, 255, 255, 0) 0%,
+            rgba(255, 255, 255, 0.14) 36%,
+            rgba(255, 255, 255, 0.55) 50%,
+            rgba(255, 255, 255, 0.14) 64%,
+            rgba(255, 255, 255, 0) 100%);
+    transform: translateX(-55%) skewX(-18deg);
+    animation: signInButtonSweep 2.6s linear infinite;
+    pointer-events: none;
+}
+
+.btn-login-submit::after {
+    content: '';
+    position: absolute;
+    left: 8%;
+    right: 8%;
+    top: 2px;
+    height: 28%;
+    border-radius: 999px;
+    background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0.22) 42%, rgba(255, 255, 255, 0) 78%);
+    pointer-events: none;
+    animation: signInButtonShimmer 2.6s ease-in-out infinite;
 }
 
 .btn-login-submit:hover {
-    background: linear-gradient(135deg, #009040 0%, #007840 100%);
-    box-shadow: 0 6px 16px rgba(0, 128, 55, 0.3);
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0) 22%),
+        linear-gradient(180deg, #19c960 0%, #009742 46%, #007a36 100%);
+    box-shadow:
+        0 18px 34px rgba(0, 128, 55, 0.36),
+        0 2px 0 rgba(255, 255, 255, 0.34) inset,
+        0 -10px 18px rgba(0, 0, 0, 0.06) inset;
     transform: translateY(-1px);
 }
 
 .btn-login-submit:active {
     transform: translateY(1px);
+}
+
+@keyframes signInButtonPulse {
+    0%,
+    100% {
+        transform: translateY(0);
+        box-shadow:
+            0 14px 30px rgba(0, 128, 55, 0.32),
+            0 2px 0 rgba(255, 255, 255, 0.32) inset,
+            0 -10px 18px rgba(0, 0, 0, 0.08) inset;
+    }
+
+    50% {
+        transform: translateY(-1px);
+        box-shadow:
+            0 18px 36px rgba(0, 128, 55, 0.38),
+            0 2px 0 rgba(255, 255, 255, 0.34) inset,
+            0 -10px 18px rgba(0, 0, 0, 0.06) inset;
+    }
+}
+
+@keyframes signInButtonSweep {
+    0% {
+        transform: translateX(-62%) skewX(-18deg);
+        opacity: 0;
+    }
+
+    20% {
+        opacity: 0.55;
+    }
+
+    50% {
+        transform: translateX(2%) skewX(-18deg);
+        opacity: 1;
+    }
+
+    80% {
+        opacity: 0.45;
+    }
+
+    100% {
+        transform: translateX(62%) skewX(-18deg);
+        opacity: 0;
+    }
+}
+
+@keyframes signInButtonShimmer {
+    0% {
+        transform: translateX(-12%) translateY(0) scale(0.96);
+        opacity: 0.45;
+    }
+
+    50% {
+        transform: translateX(0%) translateY(-1px) scale(1);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateX(12%) translateY(0) scale(0.96);
+        opacity: 0.45;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .btn-login-submit,
+    .btn-login-submit::before,
+    .btn-login-submit::after,
+    .login-card-floating,
+    .login-card-floating::after,
+    .brand-logo-image-card,
+    .login-card-logo::before,
+    #normalLoginContainer > *,
+    .login-form-field {
+        animation: none;
+    }
 }
 
 /* OR Separator */
@@ -2414,6 +2724,7 @@ body {
     font-weight: 700;
     color: #94a3b8;
     letter-spacing: 1px;
+    font-family: 'Century Gothic';
 }
 
 /* First Time Login link */
@@ -2421,6 +2732,12 @@ body {
     display: flex;
     justify-content: center;
     margin-bottom: 0;
+}
+
+.first-time-login-link,
+.forgot-password-link,
+.remember-me-container {
+    font-family: 'Century Gothic';
 }
 
 .first-time-login-link {
@@ -2432,7 +2749,7 @@ body {
     font-weight: 600;
     text-decoration: none;
     transition: all 0.2s;
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Century Gothic';
 }
 
 .first-time-login-link:hover {
@@ -2454,7 +2771,7 @@ body {
     font-weight: 700;
     color: #94a3b8;
     letter-spacing: 1px;
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Century Gothic';
     text-transform: uppercase;
 }
 
