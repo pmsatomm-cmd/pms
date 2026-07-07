@@ -22,6 +22,11 @@ const pool = mysql.createPool({
   queueLimit: 0
 });
 
+// Set MySQL session timezone to IST
+pool.query("SET time_zone = '+05:30'")
+  .then(() => console.log("MySQL timezone set to IST"))
+  .catch(err => console.error("Timezone error:", err));
+
 async function initDb() {
   const connection = await mysql.createConnection({
     host: process.env.DB_HOST,
