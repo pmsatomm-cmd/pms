@@ -296,9 +296,19 @@ app.post('/api/log-activity', async (req, res) => {
 
 app.get('/api/activity-logs', async (req, res) => {
   try {
-    const [rows] = await pool.query(
-      'SELECT user_id as userId, user_name as userName, role, event_type as eventType, DATE_FORMAT(timestamp, "%Y-%m-%d %H:%i:%s") as timestamp FROM user_activity_logs ORDER BY timestamp DESC'
-    );
+    const [rows] = await pool.query(`
+  SELECT
+    user_id AS userId,
+    user_name AS userName,
+    role,
+    event_type AS eventType,
+    DATE_FORMAT(
+      CONVERT_TZ(timestamp, '+00:00', '+05:30'),
+      '%Y-%m-%d %H:%i:%s'
+    ) AS timestamp
+  FROM user_activity_logs
+  ORDER BY timestamp DESC
+`);
     res.json(rows);
   } catch (err) {
     console.error('Error in /api/activity-logs:', err);
