@@ -3010,21 +3010,22 @@ body {
 }
 
 .form-section-title {
-    color: #1a202c;
-    font-size: 17px;
-    font-weight: 800;
+    font-size: 18px;
+    font-weight: 700;
+    color: #1e293b;
     text-align: center;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 20px;
+    margin: 0 0 12px 0;
 }
 
 .form-section-desc {
-    color: #718096;
-    font-size: 13px;
+    display: block;
+    width: 100%;
+    font-size: 14px;
+    color: #64748b;
     text-align: center;
-    margin-top: -15px;
-    margin-bottom: 20px;
+    line-height: 24px !important;
+    margin: 0 0 24px 0;
+    padding: 0 18px;
 }
 
 .info-msg-box {
