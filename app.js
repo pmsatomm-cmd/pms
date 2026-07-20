@@ -32,8 +32,16 @@ function setSessionRole(role, employeeId = null) {
 }
 
 function setSessionCollegeProgram(collegeId, programId = null) {
-    if (collegeId) sessionStorage.setItem('tms_collegeId', collegeId);
-    if (programId) sessionStorage.setItem('tms_programId', programId);
+    if (collegeId) {
+        sessionStorage.setItem('tms_collegeId', collegeId);
+    } else {
+        sessionStorage.removeItem('tms_collegeId');
+    }
+    if (programId) {
+        sessionStorage.setItem('tms_programId', programId);
+    } else {
+        sessionStorage.removeItem('tms_programId');
+    }
 }
 
 function getSessionCollegeId() {
