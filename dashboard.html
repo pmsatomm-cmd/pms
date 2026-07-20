@@ -113,11 +113,10 @@
                     <h2>Colleges Overview</h2>
                     <p>Manage and access all your colleges in one place.</p>
                 </div>
-                <div class="overview-controls">
+                 <div class="overview-controls">
                     <div class="search-box">
-                        <input type="text" autocomplete="off" name="fake-user" style="position:absolute; left:-9999px; top:-9999px; opacity:0; width:0; height:0; border:none; padding:0;" aria-hidden="true" tabindex="-1">
                         <i class="fas fa-search search-icon"></i>
-                        <input type="text" id="searchColleges" name="search-colleges" inputmode="search" placeholder="Search colleges..." oninput="handleSearch()" autocomplete="off" />
+                        <input type="search" id="searchColleges" name="search-colleges-query" placeholder="Search colleges..." oninput="handleSearch()" autocomplete="off" autocomplete="search" spellcheck="false" />
                     </div>
                     <button class="layout-btn active" id="btnGridView" onclick="toggleLayout('grid')" title="Grid View">
                         <i class="fas fa-th-large"></i>
