@@ -355,16 +355,6 @@ function handleEmployeeCheckboxChange(input, subsectionId) {
         const checkedBoxes = container.querySelectorAll('input[type=checkbox][data-employee-checkbox]:checked');
         const selectedIds = Array.from(checkedBoxes).map(cb => cb.value);
         
-        // Enforce validation: if checklist items are Done, must have at least 1 person checked
-        const checklist = document.querySelector(`#trainingForm .checklist[data-subsection="${subsectionId}"]`);
-        const hasDoneItems = checklist ? Array.from(checklist.querySelectorAll('.toggle-switch[data-item]')).some(cb => cb.checked) : false;
-        
-        if (hasDoneItems && selectedIds.length === 0) {
-            alert(`At least one employee must be selected in "Completed By" while items in this section are marked as Done.`);
-            input.checked = true; // Re-check
-            return;
-        }
-        
         const tagsDiv = container.querySelector('.employee-selected-tags');
         const placeholderSpan = container.querySelector('.employee-placeholder');
         const list = employees.filter(emp => !isAdminUserId(emp.id));
@@ -1166,23 +1156,29 @@ async function initDashboardPage() {
     // Ensure dashboard search input is empty by default (prevent browser autofill / restore)
     const searchInput = document.getElementById('searchColleges');
     if (searchInput) {
+        searchInput.value = '';
+        dashboardSearchQuery = '';
         searchInput.setAttribute('autocomplete', 'off');
         searchInput.setAttribute('autocorrect', 'off');
         searchInput.setAttribute('autocapitalize', 'off');
         searchInput.setAttribute('spellcheck', 'false');
-        searchInput.setAttribute('name', 'search-colleges');
-        try {
-            searchInput.value = '';
-            dashboardSearchQuery = '';
-        } catch (e) { }
-        // Browser may restore autofill after load, so clear once more after a short delay.
-        setTimeout(() => {
-            try {
-                searchInput.value = '';
-                dashboardSearchQuery = '';
-                renderColleges();
-            } catch (e) { }
-        }, 150);
+        searchInput.setAttribute('name', 'search-colleges-query');
+
+        // Prevent autofill by clearing value across multiple intervals if browser attempts to insert saved credentials
+        [0, 50, 150, 300, 500].forEach(delay => {
+            setTimeout(() => {
+                try {
+                    if (searchInput.value && (
+                        !dashboardSearchQuery ||
+                        searchInput.value.trim().toLowerCase() === (currentEmployeeId || '').toLowerCase()
+                    )) {
+                        searchInput.value = '';
+                        dashboardSearchQuery = '';
+                        renderColleges();
+                    }
+                } catch (e) { }
+            }, delay);
+        });
     }
 }
 
@@ -1383,7 +1379,7 @@ function renderColleges() {
         const collegeDesc = college.createdBy ? `Created by: ${college.createdBy}` : 'Process Documentation';
 
         return `
-            <div class="college-card">
+            <div class="college-card" onclick="openProgramPage('${id}')" style="cursor: pointer;">
                 <div class="college-card-header">
                     <div class="college-card-brand">
                         <div class="college-logo-letter">${firstLetter}</div>
@@ -1566,6 +1562,14 @@ async function initProgramPage() {
         window.location.href = 'dashboard.html';
         return;
     }
+    const formCollegeNameEl = document.getElementById('formCollegeName');
+    if (formCollegeNameEl && colleges[currentCollegeId]) {
+        formCollegeNameEl.textContent = colleges[currentCollegeId].name || '---';
+    }
+    const currentCollegePrograms = colleges[currentCollegeId].programs || {};
+    if (currentProgramId && !currentCollegePrograms[currentProgramId]) {
+        currentProgramId = null;
+    }
     setSessionCollegeProgram(currentCollegeId, currentProgramId || null);
     renderProgramSelector();
     const newProgram = getQueryParam('new') === '1';
@@ -1573,8 +1577,8 @@ async function initProgramPage() {
         openNewProgramModal(currentCollegeId);
     } else {
         if (!currentProgramId) {
-            const activeProgram = Object.values(colleges[currentCollegeId].programs || {}).find(p => !p.isArchived);
-            currentProgramId = activeProgram ? activeProgram.id : Object.keys(colleges[currentCollegeId].programs || {})[0] || null;
+            const activeProgram = Object.values(currentCollegePrograms).find(p => !p.isArchived);
+            currentProgramId = activeProgram ? activeProgram.id : Object.keys(currentCollegePrograms)[0] || null;
             if (currentProgramId) setSessionCollegeProgram(currentCollegeId, currentProgramId);
         }
         const selector = document.getElementById('programSelector');
@@ -1584,6 +1588,8 @@ async function initProgramPage() {
 }
 
 function goBackToDashboard() {
+    sessionStorage.removeItem('tms_collegeId');
+    sessionStorage.removeItem('tms_programId');
     window.location.href = 'dashboard.html';
 }
 
@@ -1837,6 +1843,10 @@ function switchProgram() {
     const college = colleges[currentCollegeId];
     const program = college?.programs?.[programId];
     if (!program) return;
+    const formCollegeNameEl = document.getElementById('formCollegeName');
+    if (formCollegeNameEl && college) {
+        formCollegeNameEl.textContent = college.name || '---';
+    }
     document.getElementById('formProgramName').textContent = ' - ' + (program.name || 'Unnamed');
     document.getElementById('programInfo').textContent = program.isArchived ? ' Archived - Read Only' : ' Active - In Progress';
     if (formContainer) formContainer.classList.add('active');
@@ -2215,15 +2225,11 @@ function markCompleteAndArchive() {
         alert('This program is already archived.');
         return;
     }
-    if (!checkSignatureStatus()) {
-        alert('All 3 signatories must sign and date before archiving.');
-        return;
-    }
     saveCurrentProgram();
     program.isArchived = true;
     saveData();
     renderProgramSelector();
-    alert(' Program archived successfully.');
+    alert('Program completed and archived successfully.');
 }
 
 function clearForm() {
@@ -2277,19 +2283,6 @@ function tformToggleItem(el) {
     }
     const key = el.dataset.item;
     const active = el.checked;
-
-    // Enforce Completed By is mandatory before marking Done
-    const parts = key.split('-');
-    const subsectionId = parts[0]; // e.g. "1A"
-    const empSelectDiv = document.getElementById(`empSelect-${subsectionId}`);
-    if (active && empSelectDiv) {
-        const checkedEmployees = empSelectDiv.querySelectorAll('input[type=checkbox][data-employee-checkbox]:checked');
-        if (checkedEmployees.length === 0) {
-            alert(`Please select at least one employee in "Completed By" for this section before marking items as Done.`);
-            el.checked = false;
-            return;
-        }
-    }
 
     // Special handling for scope-dropdown items (1A-3 and 3A-3)
     const scopeMap = {
@@ -2391,17 +2384,6 @@ function tformToggleMaster(el) {
     }
     const active = el.checked;
 
-    // Enforce Completed By is mandatory before marking Done
-    const subsectionId = el.dataset.target;
-    const empSelectDiv = document.getElementById(`empSelect-${subsectionId}`);
-    if (active && empSelectDiv) {
-        const checkedEmployees = empSelectDiv.querySelectorAll('input[type=checkbox][data-employee-checkbox]:checked');
-        if (checkedEmployees.length === 0) {
-            alert(`Please select at least one employee in "Completed By" for this section before marking items as Done.`);
-            el.checked = false;
-            return;
-        }
-    }
     el.classList.toggle('active', active);
     const status = document.getElementById('tform-masterStatus-' + el.dataset.target);
     if (status) {
@@ -2428,18 +2410,6 @@ function tformSetAll(subsectionId, state) {
     // Disable for admin (view-only)
     if (currentRole === 'admin') return;
     if (isProgramArchived()) return;
-
-    // Enforce Completed By is mandatory before marking Done
-    if (state) {
-        const empSelectDiv = document.getElementById(`empSelect-${subsectionId}`);
-        if (empSelectDiv) {
-            const checkedEmployees = empSelectDiv.querySelectorAll('input[type=checkbox][data-employee-checkbox]:checked');
-            if (checkedEmployees.length === 0) {
-                alert(`Please select at least one employee in "Completed By" for this section before marking items as Done.`);
-                return;
-            }
-        }
-    }
 
     const checklist = document.querySelector('#trainingForm .checklist[data-subsection="' + subsectionId + '"]');
     if (!checklist) return;
@@ -2734,4 +2704,11 @@ window.addEventListener('DOMContentLoaded', async () => {
     if (document.getElementById('loginPage')) await initLoginPage();
     if (document.getElementById('dashboardPage')) await initDashboardPage();
     if (document.getElementById('programPage')) await initProgramPage();
+});
+
+window.addEventListener('pageshow', async (event) => {
+    if (event.persisted) {
+        if (document.getElementById('dashboardPage')) await initDashboardPage();
+        if (document.getElementById('programPage')) await initProgramPage();
+    }
 });
